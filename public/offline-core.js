@@ -265,7 +265,17 @@
     };
   }
 
-  window.PorezatorOffline = {
+  const exports = {
+    parseCsvByMode,
+    aggregateRows,
+    fifoMatchLocal,
+    yearToFull,
     generateXmlOffline,
   };
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = exports;
+  } else {
+    window.PorezatorOffline = exports;
+  }
 })();
