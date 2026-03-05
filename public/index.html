@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Porezator – Poreska prijava generator</title>
+  <style>
+    :root {
+      --bg: #f5f5f5;
+      --card: #fff;
+      --accent: #1a73e8;
+      --accent-hover: #1558b0;
+      --border: #ddd;
+      --text: #333;
+      --muted: #666;
+      --error: #d93025;
+      --success: #188038;
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .autosave-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1.4rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .autosave-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .autosave-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #9aa0a6;
+    }
+
+    .autosave-dot.saving {
+      background: #f9ab00;
+    }
+
+    .autosave-dot.saved {
+      background: var(--success);
+    }
+
+    .btn-link {
+      background: transparent;
+      border: 0;
+      color: var(--accent);
+      font-size: 0.82rem;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+    }
+
+    .disclaimer {
+      background: #fff8e8;
+      border: 1px solid #f1d7a6;
+      color: #6b4a09;
+      border-radius: var(--radius);
+      padding: 0.7rem 0.9rem;
+      font-size: 0.84rem;
+      line-height: 1.4;
+      margin-bottom: 0.8rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      color: var(--muted);
+    }
+
+    input, select, textarea {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15);
+    }
+
+    textarea {
+      min-height: 140px;
+      font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      resize: vertical;
+    }
+
+    .hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+
+    .computed-dates {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      background: #f9f9f9;
+      padding: 0.6rem 0.75rem;
+      border-radius: 6px;
+    }
+
+    .computed-dates span {
+      flex: 1;
+    }
+
+    .computed-dates strong {
+      color: var(--text);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+      width: 100%;
+    }
+
+    .btn:hover { background: var(--accent-hover); }
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .btn .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-width: 420px;
+      width: calc(100% - 2rem);
+    }
+
+    .toast {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: toast-in 0.3s ease;
+      line-height: 1.4;
+    }
+
+    .toast-msg { flex: 1; }
+
+    .toast-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+      padding: 0;
+      opacity: 0.6;
+      transition: opacity 0.15s;
+      flex-shrink: 0;
+    }
+    .toast-close:hover { opacity: 1; }
+
+    .toast-error {
+      background: #fce8e6;
+      color: var(--error);
+      border: 1px solid #f5c6cb;
+    }
+    .toast-error .toast-close { color: var(--error); }
+
+    .toast-success {
+      background: #e6f4ea;
+      color: var(--success);
+      border: 1px solid #b7e1cd;
+    }
+    .toast-success .toast-close { color: var(--success); }
+
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateX(40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes toast-out {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(40px); }
+    }
+
+    .preview-box {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 0.8rem;
+      white-space: pre;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .file-upload-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .file-upload-wrap input[type="file"] {
+      position: static;
+      width: 100%;
+      font-size: 0.75rem;
+      padding: 0.4rem 0;
+      border: 0;
+      background: transparent;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+    }
+
+    .btn-outline:hover {
+      background: rgba(26, 115, 232, 0.08);
+    }
+
+    .btn-outline:disabled {
+      color: #ccc;
+      border-color: #ccc;
+      background: transparent;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      width: auto;
+      display: inline-flex;
+      margin-top: 0.5rem;
+    }
+
+    .data-table-wrap {
+      margin-top: 0.75rem;
+      overflow-x: auto;
+      display: none;
+      max-width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .data-table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    .summary-section {
+      margin-top: 1rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+    }
+
+    .summary-section details > summary {
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+      list-style: none;
+    }
+
+    .summary-section details > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .data-table th, .data-table td {
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--border);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .data-table th {
+      background: #f1f3f4;
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+    }
+
+    .data-table tr:nth-child(even) { background: #fafafa; }
+    .data-table tr:hover { background: #e8f0fe; }
+
+    .data-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+    .csv-upload-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .alert-warning {
+      background: #fef7e0;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .validation-box {
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+
+    .validation-box ul {
+      margin: 0.25rem 0 0 1.25rem;
+      font-size: 0.88rem;
+    }
+
+    .validation-box li { margin-bottom: 0.15rem; }
+    .validation-box .ok { color: var(--success); }
+    .validation-box .fail { color: var(--error); font-weight: 600; }
+
+    .mode-note {
+      margin-top: 0.75rem;
+      padding: 0.75rem 0.9rem;
+      border: 1px solid #c9d6ea;
+      background: #f4f8ff;
+      border-radius: 6px;
+      font-size: 0.83rem;
+      color: #204170;
+      line-height: 1.4;
+    }
+
+    /* Collapsible card */
+    .card-collapsible > summary {
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-collapsible > summary::-webkit-details-marker { display: none; }
+    .card-collapsible > summary::after {
+      content: '\25B6';
+      font-size: 0.7rem;
+      color: var(--muted);
+      transition: transform 0.2s;
+    }
+    .card-collapsible[open] > summary::after {
+      transform: rotate(90deg);
+    }
+    .card-collapsible > summary h2 {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .card-collapsible[open] > summary {
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 640px) {
+      body { padding: 1rem; }
+      .form-row { flex-wrap: wrap; }
+      .form-row .form-group { min-width: 100%; }
+      .actions { flex-direction: column; }
+      .actions .btn { width: 100%; }
+      .computed-dates { flex-direction: column; gap: 0.3rem; }
+      h1 { font-size: 1.4rem; }
+    }
+
+    @media (min-width: 641px) {
+      .actions .btn { width: auto; flex: 0 0 auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="disclaimer">
+      ⚠️ Ovo nije zvaničan alat državnih organa i koristi se na sopstvenu odgovornost. Aplikacija ne skladišti vaše podatke niti koristi telemetriju. Kod je otvorenog tipa (open source). Server se koristi isključivo za preuzimanje kursa valute.
+    </div>
+    <h1>📋 Porezator</h1>
+    <p class="subtitle">Generator poreske prijave za prenos HOV (PPDG-3R)</p>
+    <div class="autosave-bar">
+      <span class="autosave-status" id="autosaveStatus">
+        <span class="autosave-dot" id="autosaveDot"></span>
+        <span id="autosaveText">Auto-save isključen</span>
+      </span>
+      <button class="btn-link" onclick="clearSavedData()">Obriši sačuvane podatke</button>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <div class="card">
+      <h2>Režim rada</h2>
+      <label style="display:flex; align-items:center; gap:0.45rem; color:var(--text); font-weight:normal; margin-bottom:0.5rem;">
+        <input id="offlineMode" type="checkbox" style="width:auto;">
+        Offline mode (bez slanja podataka na server)
+      </label>
+      <div class="mode-note" id="modeNote" style="margin-top:0;">
+        Online mode: podaci se šalju serveru radi obračuna kursa i generisanja XML.<br>
+        Offline mode: ništa se ne šalje serveru, CSV podržava dodatnu kolonu <strong>srednji_kurs</strong> po redu (format: datum,ticker,shares,price,currency,srednji_kurs).
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Podaci o prijavi</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="vrstaPrijave">Vrsta prijave</label>
+          <select id="vrstaPrijave">
+            <option value="1" selected>1 - Opšta prijava</option>
+            <option value="3">3 - Prijava po članu 182b ZPPPA</option>
+            <option value="6">6 - Prijava po članu 39. ZPPPA</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="osnovZaPrijavu">Osnov za prijavu</label>
+          <select id="osnovZaPrijavu">
+            <option value="1">1 - Prenos stvarnih prava na nepokretnosti</option>
+            <option value="2">2 - Prenos autorskih i srodnih prava i prava industrijske svojine</option>
+            <option value="3">3 - Prenos udela u kapitalu pravnih lica</option>
+            <option value="4" selected>4 - Prenos akcija i ostalih HoV, uključujući i investicione jedinice</option>
+            <option value="5">5 - Prodaja nepokretnosti sa pravom na poresko oslobođenje</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="filingDate">Datum prijave</label>
+          <input type="date" id="filingDate">
+        </div>
+        <div class="form-group">
+          <label for="year">Godina prodaje</label>
+          <input id="year" type="number" min="2000" max="2100" step="1" value="2025">
+        </div>
+        <div class="form-group">
+          <label for="half">Polugodište</label>
+          <select id="half">
+            <option value="H1">H1 (jan–jun)</option>
+            <option value="H2" selected>H2 (jul–dec)</option>
+          </select>
+        </div>
+      </div>
+      <div class="computed-dates" id="computedDates">
+        <span>Datum ostvarenja prihoda: <strong id="datumOstvarenja">–</strong></span>
+        <span>Dospelost: <strong id="datumDospelosti">–</strong></span>
+      </div>
+    </div>
+
+    <details class="card card-collapsible" id="personalDataCard" open>
+      <summary><h2>Lični podaci obveznika</h2></summary>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tipPoreskogObveznika">Tip poreskog obveznika</label>
+          <input id="tipPoreskogObveznika" value="1">
+        </div>
+        <div class="form-group">
+          <label for="poreskiIdentifikacioniBroj">PIB / JMBG</label>
+          <input id="poreskiIdentifikacioniBroj" placeholder="JMBG">
+        </div>
+        <div class="form-group">
+          <label for="jmbg">JMBG podnosioca</label>
+          <input id="jmbg" placeholder="JMBG">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="imeIPrezime">Ime i prezime</label>
+          <input id="imeIPrezime" placeholder="IME PREZIME">
+        </div>
+        <div class="form-group">
+          <label for="prebivalisteSifra">Šifra prebivališta</label>
+          <input id="prebivalisteSifra" placeholder="000">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="adresa">Adresa</label>
+          <input id="adresa" placeholder="Grad, Ulica i broj">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="telefon">Telefon</label>
+          <input id="telefon" placeholder="06X...">
+        </div>
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input id="email" placeholder="email@primer.com">
+        </div>
+      </div>
+    </details>
+
+    <div class="card">
+      <h2>CSV prodaje</h2>
+      <div class="file-upload-wrap">
+        <textarea id="salesCsv" placeholder="datum,ticker,shares,price,currency,srednji_kurs
+2025-11-25,VWCE,85,142.38,EUR,117.25"></textarea>
+        <label class="csv-upload-label" for="salesCsvFile">Učitaj CSV fajl</label>
+        <input id="salesCsvFile" type="file" accept=".csv,.txt" onchange="loadFile(this, 'salesCsv')">
+      </div>
+      <p class="hint">Format: YYYY-MM-DD, Ticker, Shares, Price, Currency, Srednji_kurs (opciono za online, obavezno za offline) · <a href="#" onclick="downloadTemplate('sales'); return false;">Preuzmi template</a></p>
+      <button class="btn btn-sm btn-outline" onclick="loadTable('salesCsv', 'salesTable')">📋 Učitaj tabelu</button>
+      <div class="data-table-wrap" id="salesTable"></div>
+    </div>
+
+    <div class="card">
+      <h2>CSV kupovine</h2>
+      <div class="file-upload-wrap">
+        <textarea id="purchasesCsv" placeholder="datum,ticker,shares,price,currency,srednji_kurs
+2022-06-22,VWCE,8,89.50,EUR,117.00
+2022-07-06,VWCE,21,93.00,EUR,117.40"></textarea>
+        <label class="csv-upload-label" for="purchasesCsvFile">Učitaj CSV fajl</label>
+        <input id="purchasesCsvFile" type="file" accept=".csv,.txt" onchange="loadFile(this, 'purchasesCsv')">
+      </div>
+      <p class="hint">Format: YYYY-MM-DD, Ticker, Shares, Price, Currency, Srednji_kurs (opciono za online, obavezno za offline) · <a href="#" onclick="downloadTemplate('purchases'); return false;">Preuzmi template</a></p>
+      <button class="btn btn-sm btn-outline" onclick="loadTable('purchasesCsv', 'purchasesTable')">📋 Učitaj tabelu</button>
+      <div class="data-table-wrap" id="purchasesTable"></div>
+    </div>
+
+    <div class="validation-box" id="validationBox"></div>
+
+    <div class="force-override" id="forceOverride" style="display:none; margin-bottom: 1rem;">
+      <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; color:var(--text); font-weight:normal; font-size:0.9rem;">
+        <input type="checkbox" id="forceCheckbox" style="width:auto;">
+        Dozvoli generisanje bez potpunog pokrivanja kupovinama (force override)
+      </label>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="generateBtn" onclick="generate()">
+        Generiši XML
+      </button>
+      <button class="btn btn-outline" id="downloadBtn" onclick="downloadXml()" disabled>
+        Preuzmi XML
+      </button>
+    </div>
+
+    <pre class="preview-box" id="preview"></pre>
+
+    <div class="card" id="documentsCard" style="display:none; margin-top:1.5rem;">
+      <h2>Potrebna dokumentacija</h2>
+      <p style="font-size:0.85rem; color:var(--muted); margin-bottom:0.75rem;">Lista dokumenata koje treba priložiti uz poresku prijavu:</p>
+      <div id="documentsList"></div>
+    </div>
+  </div>
+
+  <script src="offline-core.js"></script>
+  <script>
+    let generatedXml = null;
+    const LOCAL_STORAGE_KEY = 'porezator_form_v1';
+    let autosaveTimeout = null;
+
+    function setAutosaveIndicator(state, customText = '') {
+      const dot = document.getElementById('autosaveDot');
+      const text = document.getElementById('autosaveText');
+      dot.classList.remove('saving', 'saved');
+
+      if (state === 'saving') {
+        dot.classList.add('saving');
+        text.textContent = customText || 'Čuvanje...';
+      } else if (state === 'saved') {
+        dot.classList.add('saved');
+        text.textContent = customText || 'Sačuvano lokalno';
+      } else {
+        text.textContent = customText || 'Auto-save isključen';
+      }
+    }
+
+    function getFormState() {
+      return {
+        offlineMode: document.getElementById('offlineMode').checked,
+        vrstaPrijave: document.getElementById('vrstaPrijave').value,
+        osnovZaPrijavu: document.getElementById('osnovZaPrijavu').value,
+        year: document.getElementById('year').value,
+        half: document.getElementById('half').value,
+        filingDate: document.getElementById('filingDate').value,
+        personalData: {
+          tipPoreskogObveznika: document.getElementById('tipPoreskogObveznika').value,
+          poreskiIdentifikacioniBroj: document.getElementById('poreskiIdentifikacioniBroj').value,
+          imeIPrezime: document.getElementById('imeIPrezime').value,
+          prebivalisteSifra: document.getElementById('prebivalisteSifra').value,
+          adresa: document.getElementById('adresa').value,
+          telefon: document.getElementById('telefon').value,
+          email: document.getElementById('email').value,
+          jmbg: document.getElementById('jmbg').value,
+        },
+        salesCsv: document.getElementById('salesCsv').value,
+        purchasesCsv: document.getElementById('purchasesCsv').value,
+        force: document.getElementById('forceCheckbox').checked,
+      };
+    }
+
+    function saveFormState() {
+      try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(getFormState()));
+        setAutosaveIndicator('saved', `Sačuvano lokalno (${new Date().toLocaleTimeString('sr-RS')})`);
+      } catch (err) {
+        setAutosaveIndicator('idle', 'Greška pri čuvanju');
+      }
+    }
+
+    function scheduleAutosave() {
+      setAutosaveIndicator('saving');
+      clearTimeout(autosaveTimeout);
+      autosaveTimeout = setTimeout(saveFormState, 350);
+    }
+
+    function loadSavedData() {
+      const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (!raw) return false;
+
+      try {
+        const state = JSON.parse(raw);
+        document.getElementById('offlineMode').checked = !!state.offlineMode;
+        if (state.vrstaPrijave) document.getElementById('vrstaPrijave').value = state.vrstaPrijave;
+        if (state.osnovZaPrijavu) document.getElementById('osnovZaPrijavu').value = state.osnovZaPrijavu;
+        if (state.year) document.getElementById('year').value = state.year;
+        if (state.half) document.getElementById('half').value = state.half;
+        if (state.filingDate) document.getElementById('filingDate').value = state.filingDate;
+        if (state.personalData) {
+          if (typeof state.personalData.tipPoreskogObveznika === 'string') document.getElementById('tipPoreskogObveznika').value = state.personalData.tipPoreskogObveznika;
+          if (typeof state.personalData.poreskiIdentifikacioniBroj === 'string') document.getElementById('poreskiIdentifikacioniBroj').value = state.personalData.poreskiIdentifikacioniBroj;
+          if (typeof state.personalData.imeIPrezime === 'string') document.getElementById('imeIPrezime').value = state.personalData.imeIPrezime;
+          if (typeof state.personalData.prebivalisteSifra === 'string') document.getElementById('prebivalisteSifra').value = state.personalData.prebivalisteSifra;
+          if (typeof state.personalData.adresa === 'string') document.getElementById('adresa').value = state.personalData.adresa;
+          if (typeof state.personalData.telefon === 'string') document.getElementById('telefon').value = state.personalData.telefon;
+          if (typeof state.personalData.email === 'string') document.getElementById('email').value = state.personalData.email;
+          if (typeof state.personalData.jmbg === 'string') document.getElementById('jmbg').value = state.personalData.jmbg;
+        }
+        if (typeof state.salesCsv === 'string') document.getElementById('salesCsv').value = state.salesCsv;
+        if (typeof state.purchasesCsv === 'string') document.getElementById('purchasesCsv').value = state.purchasesCsv;
+        document.getElementById('forceCheckbox').checked = !!state.force;
+        setAutosaveIndicator('saved', 'Učitano iz lokalne memorije');
+        return true;
+      } catch (err) {
+        setAutosaveIndicator('idle', 'Neispravni sačuvani podaci');
+        return false;
+      }
+    }
+
+    function clearSavedData() {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      document.getElementById('vrstaPrijave').value = '1';
+      document.getElementById('osnovZaPrijavu').value = '4';
+      document.getElementById('offlineMode').checked = false;
+      document.getElementById('year').value = new Date().getFullYear();
+      document.getElementById('half').value = 'H2';
+      document.getElementById('tipPoreskogObveznika').value = '1';
+      document.getElementById('poreskiIdentifikacioniBroj').value = '';
+      document.getElementById('imeIPrezime').value = '';
+      document.getElementById('prebivalisteSifra').value = '';
+      document.getElementById('adresa').value = '';
+      document.getElementById('telefon').value = '';
+      document.getElementById('email').value = '';
+      document.getElementById('jmbg').value = '';
+      document.getElementById('salesCsv').value = '';
+      document.getElementById('purchasesCsv').value = '';
+      document.getElementById('forceCheckbox').checked = false;
+      document.getElementById('filingDate').value = new Date().toISOString().split('T')[0];
+      syncPeriodFromFilingDate();
+
+      document.getElementById('salesTable').style.display = 'none';
+      document.getElementById('purchasesTable').style.display = 'none';
+      document.getElementById('validationBox').style.display = 'none';
+      document.getElementById('forceOverride').style.display = 'none';
+      document.getElementById('preview').style.display = 'none';
+      document.getElementById('documentsCard').style.display = 'none';
+      document.getElementById('downloadBtn').disabled = true;
+
+      updateDates();
+      setAutosaveIndicator('idle', 'Sačuvani podaci obrisani');
+      showAlert('Lokalno sačuvani podaci su obrisani.', 'success');
+    }
+
+    // ─── Set today as default filing date ──────────────────────────────────────
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('filingDate').value = today;
+
+    // For a filing date, derive previous half-year (period being reported).
+    function syncPeriodFromFilingDate() {
+      const filing = document.getElementById('filingDate').value;
+      if (!filing) return;
+      const d = new Date(filing + 'T00:00:00');
+      if (Number.isNaN(d.getTime())) return;
+
+      const filingYear = d.getFullYear();
+      const filingMonth = d.getMonth() + 1;
+
+      if (filingMonth <= 7) {
+        // Jan-Jul filing refers to previous year's H2.
+        document.getElementById('year').value = String(filingYear - 1);
+        document.getElementById('half').value = 'H2';
+      } else {
+        // Aug-Dec filing refers to current year's H1.
+        document.getElementById('year').value = String(filingYear);
+        document.getElementById('half').value = 'H1';
+      }
+      updateDates();
+      scheduleAutosave();
+    }
+
+    // ─── Compute displayed dates ───────────────────────────────────────────────
+    function updateDates() {
+      const year = parseInt(document.getElementById('year').value, 10);
+      if (!Number.isFinite(year)) return;
+      const half = document.getElementById('half').value;
+      let ostvarenje, dospelost;
+      if (half === 'H2') {
+        ostvarenje = `${year}-12-31`;
+        dospelost = `${year + 1}-01-31`;
+      } else {
+        ostvarenje = `${year}-06-30`;
+        dospelost = `${year}-07-31`;
+      }
+      document.getElementById('datumOstvarenja').textContent = ostvarenje;
+      document.getElementById('datumDospelosti').textContent = dospelost;
+    }
+
+    document.getElementById('year').addEventListener('input', updateDates);
+    document.getElementById('half').addEventListener('change', updateDates);
+    document.getElementById('filingDate').addEventListener('change', syncPeriodFromFilingDate);
+
+    const autosaveBindings = [
+      { id: 'offlineMode', event: 'change' },
+      { id: 'vrstaPrijave', event: 'change' },
+      { id: 'osnovZaPrijavu', event: 'change' },
+      { id: 'year', event: 'input' },
+      { id: 'half', event: 'change' },
+      { id: 'filingDate', event: 'change' },
+      { id: 'tipPoreskogObveznika', event: 'input' },
+      { id: 'poreskiIdentifikacioniBroj', event: 'input' },
+      { id: 'imeIPrezime', event: 'input' },
+      { id: 'prebivalisteSifra', event: 'input' },
+      { id: 'adresa', event: 'input' },
+      { id: 'telefon', event: 'input' },
+      { id: 'email', event: 'input' },
+      { id: 'jmbg', event: 'input' },
+      { id: 'salesCsv', event: 'input' },
+      { id: 'purchasesCsv', event: 'input' },
+      { id: 'forceCheckbox', event: 'change' },
+    ];
+    autosaveBindings.forEach(({ id, event }) => {
+      document.getElementById(id).addEventListener(event, scheduleAutosave);
+    });
+
+    const loaded = loadSavedData();
+    if (!loaded) {
+      syncPeriodFromFilingDate();
+    }
+    updateDates();
+    if (!loaded) setAutosaveIndicator('idle', 'Nema sačuvanih podataka');
+
+    // ─── Load CSV from file ────────────────────────────────────────────────────
+    function loadFile(input, targetId) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById(targetId).value = e.target.result;
+        scheduleAutosave();
+      };
+      reader.readAsText(file);
+    }
+
+    // ─── Toast notifications ───────────────────────────────────────────────
+    function showAlert(msg, type = 'error') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `<span class="toast-msg">${msg}</span><button class="toast-close" onclick="dismissToast(this.parentElement)">&times;</button>`;
+      container.appendChild(toast);
+
+      const duration = type === 'success' ? 5000 : 10000;
+      setTimeout(() => dismissToast(toast), duration);
+    }
+
+    function dismissToast(el) {
+      if (!el || !el.parentElement) return;
+      el.style.animation = 'toast-out 0.25s ease forwards';
+      el.addEventListener('animationend', () => el.remove());
+    }
+
+    function hideAlert() {
+      const container = document.getElementById('toastContainer');
+      container.innerHTML = '';
+    }
+
+    // Offline XML engine is extracted in public/offline-core.js
+
+    // ─── Shared form body builder ───────────────────────────────────────────
+    function getFormBody() {
+      return {
+        offlineMode: document.getElementById('offlineMode').checked,
+        vrstaPrijave: document.getElementById('vrstaPrijave').value,
+        osnovZaPrijavu: document.getElementById('osnovZaPrijavu').value,
+        year: document.getElementById('year').value,
+        half: document.getElementById('half').value,
+        filingDate: document.getElementById('filingDate').value,
+        personalData: {
+          tipPoreskogObveznika: document.getElementById('tipPoreskogObveznika').value,
+          poreskiIdentifikacioniBroj: document.getElementById('poreskiIdentifikacioniBroj').value,
+          imeIPrezime: document.getElementById('imeIPrezime').value,
+          prebivalisteSifra: document.getElementById('prebivalisteSifra').value,
+          adresa: document.getElementById('adresa').value,
+          telefon: document.getElementById('telefon').value,
+          email: document.getElementById('email').value,
+          jmbg: document.getElementById('jmbg').value,
+        },
+        salesCsv: document.getElementById('salesCsv').value,
+        purchasesCsv: document.getElementById('purchasesCsv').value,
+        force: document.getElementById('forceCheckbox').checked,
+      };
+    }
+
+    // ─── Generate ──────────────────────────────────────────────────────────────
+    async function generate() {
+      hideAlert();
+      const btn = document.getElementById('generateBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Generišem...';
+
+      const body = getFormBody();
+
+      try {
+        let result;
+        if (body.offlineMode) {
+          result = window.PorezatorOffline.generateXmlOffline(body);
+        } else {
+          const resp = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+
+          if (!resp.ok) {
+            const err = await resp.json();
+            throw new Error(err.error || 'Greška na serveru');
+          }
+          result = await resp.json();
+        }
+
+        generatedXml = result.xml;
+        document.getElementById('preview').textContent = generatedXml;
+        document.getElementById('preview').style.display = 'block';
+        document.getElementById('downloadBtn').disabled = false;
+        renderDocuments(result.documents, result.summary);
+        showAlert('XML uspešno generisan!', 'success');
+      } catch (err) {
+        showAlert(err.message);
+        document.getElementById('preview').style.display = 'none';
+        document.getElementById('downloadBtn').disabled = true;
+        document.getElementById('documentsCard').style.display = 'none';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Generiši XML';
+      }
+    }
+
+    // ─── Load table preview ─────────────────────────────────────────────────
+    function parseCsvText(text) {
+      const lines = text.trim().split('\n').filter(l => l.trim());
+      const rows = [];
+      for (const line of lines) {
+        const delimiter = line.includes('\t') ? '\t' : ',';
+        const parts = line.split(delimiter).map(s => s.trim());
+        if (parts[0].toLowerCase().includes('datum')) continue;
+        if (parts.length < 5) continue;
+        const row = {
+          date: parts[0],
+          ticker: parts[1].toUpperCase(),
+          shares: parseFloat(parts[2]),
+          price: parseFloat(parts[3]),
+          currency: parts[4].toUpperCase(),
+        };
+        if (parts.length >= 6 && parts[5]) {
+          row.srednjiKurs = parseFloat(parts[5].replace(/,/g, ''));
+        }
+        rows.push(row);
+      }
+      return rows;
+    }
+
+    function validateCoverage() {
+      const salesText = document.getElementById('salesCsv').value.trim();
+      const purchasesText = document.getElementById('purchasesCsv').value.trim();
+      const box = document.getElementById('validationBox');
+
+      if (!salesText || !purchasesText) {
+        box.style.display = 'none';
+        return;
+      }
+
+      const sales = parseCsvText(salesText);
+      const purchases = parseCsvText(purchasesText);
+
+      // Aggregate by ticker+date (same as server) to check post-aggregation values
+      function aggregate(rows) {
+        const map = {};
+        for (const r of rows) {
+          const key = `${r.date}|${r.ticker}|${r.currency}`;
+          if (!map[key]) {
+            map[key] = { ...r, totalCost: r.shares * r.price };
+          } else {
+            map[key].totalCost += r.shares * r.price;
+            map[key].shares += r.shares;
+          }
+        }
+        return Object.values(map).map(r => ({ ...r, price: r.totalCost / r.shares }));
+      }
+
+      const aggSales = aggregate(sales);
+      const aggPurchases = aggregate(purchases);
+
+      // Check for fractional shares (< 1) after aggregation
+      let hasWarning = false;
+      let warningHtml = '';
+      for (const s of aggSales) {
+        if (s.shares < 1) {
+          hasWarning = true;
+          warningHtml += `<li>⚠️ Prodaja: ${s.ticker} na ${s.date} — ${s.shares.toFixed(4)} shares (ispod 1)</li>`;
+        }
+      }
+      for (const p of aggPurchases) {
+        if (p.shares < 1) {
+          hasWarning = true;
+          warningHtml += `<li>⚠️ Kupovina: ${p.ticker} na ${p.date} — ${p.shares.toFixed(4)} shares (ispod 1)</li>`;
+        }
+      }
+
+      // Sum shares by ticker
+      const soldByTicker = {};
+      for (const s of aggSales) {
+        soldByTicker[s.ticker] = (soldByTicker[s.ticker] || 0) + s.shares;
+      }
+      const boughtByTicker = {};
+      for (const p of aggPurchases) {
+        boughtByTicker[p.ticker] = (boughtByTicker[p.ticker] || 0) + p.shares;
+      }
+
+      let hasError = false;
+      let html = '<ul>';
+      for (const ticker of Object.keys(soldByTicker).sort()) {
+        const sold = soldByTicker[ticker];
+        const bought = boughtByTicker[ticker] || 0;
+        const diff = bought - sold;
+        if (diff < -0.0001) {
+          hasError = true;
+          html += `<li class="fail">❌ ${ticker}: prodato ${sold.toFixed(4)}, kupljeno ${bought.toFixed(4)} — nedostaje ${Math.abs(diff).toFixed(4)} akcija</li>`;
+        } else {
+          html += `<li class="ok">✅ ${ticker}: prodato ${sold.toFixed(4)}, kupljeno ${bought.toFixed(4)} — OK</li>`;
+        }
+      }
+      html += '</ul>';
+
+      const alertClass = hasError ? 'alert alert-error' : 'alert alert-success';
+      let output = `<div class="${alertClass}">
+        <strong>${hasError ? 'Nedovoljno kupovina!' : 'Sve je u redu — kupovine pokrivaju prodaje.'}</strong>
+        ${html}
+      </div>`;
+
+      if (hasWarning) {
+        output += `<div class="alert alert-warning" style="margin-top:0.75rem;">
+          <strong>Upozorenje: neke transakcije nakon agregacije imaju manje od 1 share</strong>
+          <ul style="margin:0.25rem 0 0 1.25rem; font-size:0.88rem;">${warningHtml}</ul>
+        </div>`;
+      }
+
+      box.innerHTML = output;
+      box.style.display = 'block';
+
+      // Show/hide force override checkbox
+      document.getElementById('forceOverride').style.display = hasError ? 'block' : 'none';
+      if (!hasError) document.getElementById('forceCheckbox').checked = false;
+    }
+
+    function loadTable(textareaId, tableWrapId) {
+      const text = document.getElementById(textareaId).value.trim();
+      const wrap = document.getElementById(tableWrapId);
+      if (!text) {
+        wrap.style.display = 'none';
+        showAlert('Nema podataka za prikaz.');
+        return;
+      }
+
+      const lines = text.split('\n').filter(l => l.trim());
+      const rows = [];
+      for (const line of lines) {
+        const delimiter = line.includes('\t') ? '\t' : ',';
+        rows.push(line.split(delimiter).map(s => s.trim()));
+      }
+
+      // Detect if first row is a header
+      let hasHeader = rows[0] && rows[0][0].toLowerCase().includes('datum');
+      const maxCols = Math.max(...rows.map(r => r.length));
+      const defaultHeaders = maxCols >= 6
+        ? ['Datum', 'Ticker', 'Shares', 'Price', 'Currency', 'Srednji kurs']
+        : ['Datum', 'Ticker', 'Shares', 'Price', 'Currency'];
+      const headers = hasHeader ? rows[0] : defaultHeaders;
+      const dataRows = hasHeader ? rows.slice(1) : rows;
+
+      if (dataRows.length === 0) {
+        wrap.style.display = 'none';
+        showAlert('Nema redova sa podacima.');
+        return;
+      }
+
+      let html = '<table class="data-table"><thead><tr>';
+      html += '<th>#</th>';
+      headers.forEach(h => html += `<th>${h}</th>`);
+      html += '</tr></thead><tbody>';
+
+      dataRows.forEach((row, i) => {
+        html += '<tr>';
+        html += `<td class="num">${i + 1}</td>`;
+        row.forEach((cell, ci) => {
+          const isNum = ci >= 2 && ci <= 3 || ci === 5;
+          html += `<td${isNum ? ' class="num"' : ''}>${cell}</td>`;
+        });
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      wrap.innerHTML = html;
+      wrap.style.display = 'block';
+      hideAlert();
+      validateCoverage();
+    }
+
+    // ─── Render documents list ─────────────────────────────────────────────────
+    function renderDocuments(documents, summary) {
+      const card = document.getElementById('documentsCard');
+      const list = document.getElementById('documentsList');
+      if (!documents || documents.length === 0) {
+        card.style.display = 'none';
+        return;
+      }
+
+      // Deduplicate by docNumber
+      const seen = new Set();
+      const unique = documents.filter(d => {
+        if (seen.has(d.docNumber)) return false;
+        seen.add(d.docNumber);
+        return true;
+      });
+
+      // Group by type
+      const sales = unique.filter(d => d.type === 'Prodaja');
+      const purchases = unique.filter(d => d.type === 'Kupovina');
+
+      let html = '<div class="summary-section"><details>';
+      html += '<summary>Prikaži listu dokumenata</summary>';
+      html += '<div class="data-table-wrap" style="display:block;">';
+      html += '<table class="data-table"><thead><tr>';
+      html += '<th>Tip</th><th>Ticker</th><th>Datum</th><th>Broj dokumenta</th><th class="num">Shares</th>';
+      html += '</tr></thead><tbody>';
+
+      const renderGroup = (items, label) => {
+        for (const d of items) {
+          html += `<tr>`;
+          html += `<td>${d.type}</td>`;
+          html += `<td>${d.ticker}</td>`;
+          html += `<td>${d.date}</td>`;
+          html += `<td><code>${d.docNumber}</code></td>`;
+          html += `<td class="num">${d.shares}</td>`;
+          html += `</tr>`;
+        }
+      };
+
+      renderGroup(sales);
+      renderGroup(purchases);
+      html += '</tbody></table>';
+      html += '</div>';
+
+      html += `<p style="margin-top:1rem; font-size:0.85rem; color:var(--muted);">Ukupno dokumenata: <strong>${unique.length}</strong> (${sales.length} prodaja, ${purchases.length} kupovina)</p>`;
+      html += '</details></div>';
+
+      if (summary) {
+        const fmt = (value) => new Intl.NumberFormat('sr-RS', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+        html += `<div class="summary-section"><details>
+          <summary>Prikaži zbirni pregled i porez</summary>
+          <div class="data-table-wrap" style="display:block;">
+          <table class="data-table"><thead><tr>
+            <th>Rbr</th><th>Ticker</th><th>Datum prodaje</th><th class="num">Shares</th><th class="num">Kurs</th><th class="num">Prodato (RSD)</th><th class="num">Nabavno (RSD)</th><th class="num">Kapitalni dobitak (RSD)</th>
+          </tr></thead><tbody>`;
+
+        for (const row of summary.rows || []) {
+          html += `<tr>
+            <td>${row.redniBroj}</td>
+            <td>${row.ticker}</td>
+            <td>${row.saleDate}</td>
+            <td class="num">${fmt(row.shares)}</td>
+            <td class="num">${fmt(row.saleRate)}</td>
+            <td class="num">${fmt(row.soldRsd)}</td>
+            <td class="num">${fmt(row.boughtRsd)}</td>
+            <td class="num">${fmt(row.capitalGainRsd)}</td>
+          </tr>`;
+        }
+
+        html += `</tbody></table>
+          </div>
+          <p style="margin-top:0.8rem; font-size:0.9rem;">
+            Ukupno prodato: <strong>${fmt(summary.totalSoldRsd)} RSD</strong> ·
+            Ukupno nabavno: <strong>${fmt(summary.totalBoughtRsd)} RSD</strong> ·
+            Kapitalni dobitak: <strong>${fmt(summary.capitalGainRsd)} RSD</strong> ·
+            Procena poreza (15%): <strong>${fmt(summary.estimatedTax15Rsd)} RSD</strong>
+          </p>
+        </details></div>`;
+
+        html += `<div class="summary-section">
+          <h3 style="font-size:1rem; margin-bottom:0.6rem;">Detaljan pregled prodaja (sa kursom i RSD vrednošću)</h3>
+          <div class="data-table-wrap" style="display:block;">
+          <table class="data-table"><thead><tr>
+            <th>Rbr</th><th>Ticker</th><th>Datum</th><th class="num">Shares</th><th class="num">Cena</th><th>Valuta</th><th class="num">Srednji kurs</th><th class="num">Vrednost (RSD)</th>
+          </tr></thead><tbody>`;
+
+        for (const row of summary.salesDetails || []) {
+          html += `<tr>
+            <td>${row.redniBroj}</td>
+            <td>${row.ticker}</td>
+            <td>${row.date}</td>
+            <td class="num">${fmt(row.shares)}</td>
+            <td class="num">${fmt(row.unitPrice)}</td>
+            <td>${row.currency}</td>
+            <td class="num">${fmt(row.exchangeRate)}</td>
+            <td class="num">${fmt(row.valueRsd)}</td>
+          </tr>`;
+        }
+
+        html += `</tbody></table>
+          </div>
+        </div>`;
+
+        html += `<div class="summary-section">
+          <h3 style="font-size:1rem; margin-bottom:0.6rem;">Detaljan pregled kupovina (FIFO korišćeno)</h3>
+          <div class="data-table-wrap" style="display:block;">
+          <table class="data-table"><thead><tr>
+            <th>Rbr</th><th>Ticker</th><th>Datum</th><th class="num">Shares</th><th class="num">Cena</th><th>Valuta</th><th class="num">Srednji kurs</th><th class="num">Vrednost (RSD)</th>
+          </tr></thead><tbody>`;
+
+        for (const row of summary.buyDetails || []) {
+          html += `<tr>
+            <td>${row.redniBroj}</td>
+            <td>${row.ticker}</td>
+            <td>${row.date}</td>
+            <td class="num">${fmt(row.shares)}</td>
+            <td class="num">${fmt(row.unitPrice)}</td>
+            <td>${row.currency}</td>
+            <td class="num">${fmt(row.exchangeRate)}</td>
+            <td class="num">${fmt(row.valueRsd)}</td>
+          </tr>`;
+        }
+
+        html += `</tbody></table>
+          </div>
+        </div>`;
+      }
+
+      list.innerHTML = html;
+      card.style.display = 'block';
+    }
+
+    // ─── Download CSV template ───────────────────────────────────────────────
+    function downloadTemplate(type) {
+      const templates = {
+        sales: 'datum,ticker,shares,price,currency,srednji_kurs\n2025-11-25,VWCE,85,142.38,EUR,117.25\n',
+        purchases: 'datum,ticker,shares,price,currency,srednji_kurs\n2022-06-22,VWCE,8,89.50,EUR,117.00\n2022-07-06,VWCE,21,93.00,EUR,117.40\n',
+      };
+      const content = templates[type];
+      const filename = type === 'sales' ? 'prodaje_template.csv' : 'kupovine_template.csv';
+      const blob = new Blob([content], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ─── Download ──────────────────────────────────────────────────────────────
+    function downloadXml() {
+      if (!generatedXml) return;
+      const blob = new Blob([generatedXml], { type: 'application/xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'poreska_prijava.xml';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+  </script>
+</body>
+</html>
