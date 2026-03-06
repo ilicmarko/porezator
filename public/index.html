@@ -500,6 +500,7 @@
         Online mode: podaci se šalju serveru radi obračuna kursa i generisanja XML.<br>
         Offline mode: ništa se ne šalje serveru, CSV podržava dodatnu kolonu <strong>srednji_kurs</strong> po redu (format: datum,ticker,shares,price,currency,srednji_kurs).
       </div>
+      <button class="btn btn-sm btn-outline" style="margin-top:0.75rem;" onclick="loadExample()">📝 Generiši primer</button>
     </div>
 
     <div class="card">
@@ -1158,8 +1159,8 @@
       const sales = unique.filter(d => d.type === 'Prodaja');
       const purchases = unique.filter(d => d.type === 'Kupovina');
 
-      let html = '<div class="summary-section"><details>';
-      html += '<summary>Prikaži listu dokumenata</summary>';
+      let html = '<div class="summary-section">';
+      html += '<h3 style="font-size:1rem; margin-bottom:0.6rem;">Lista dokumenata</h3>';
       html += '<div class="data-table-wrap" style="display:block;">';
       html += '<table class="data-table"><thead><tr>';
       html += '<th>Tip</th><th>Ticker</th><th>Datum</th><th>Broj dokumenta</th><th class="num">Shares</th>';
@@ -1183,12 +1184,12 @@
       html += '</div>';
 
       html += `<p style="margin-top:1rem; font-size:0.85rem; color:var(--muted);">Ukupno dokumenata: <strong>${unique.length}</strong> (${sales.length} prodaja, ${purchases.length} kupovina)</p>`;
-      html += '</details></div>';
+      html += '</div>';
 
       if (summary) {
         const fmt = (value) => new Intl.NumberFormat('sr-RS', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
-        html += `<div class="summary-section"><details>
-          <summary>Prikaži zbirni pregled i porez</summary>
+        html += `<div class="summary-section">
+          <h3 style="font-size:1rem; margin-bottom:0.6rem;">Zbirni pregled i porez</h3>
           <div class="data-table-wrap" style="display:block;">
           <table class="data-table"><thead><tr>
             <th>Rbr</th><th>Ticker</th><th>Datum prodaje</th><th class="num">Shares</th><th class="num">Kurs</th><th class="num">Prodato (RSD)</th><th class="num">Nabavno (RSD)</th><th class="num">Kapitalni dobitak (RSD)</th>
@@ -1215,10 +1216,10 @@
             Kapitalni dobitak: <strong>${fmt(summary.capitalGainRsd)} RSD</strong> ·
             Procena poreza (15%): <strong>${fmt(summary.estimatedTax15Rsd)} RSD</strong>
           </p>
-        </details></div>`;
+        </div>`;
 
-        html += `<div class="summary-section">
-          <h3 style="font-size:1rem; margin-bottom:0.6rem;">Detaljan pregled prodaja (sa kursom i RSD vrednošću)</h3>
+        html += `<div class="summary-section"><details>
+          <summary>Detaljan pregled prodaja (sa kursom i RSD vrednošću)</summary>
           <div class="data-table-wrap" style="display:block;">
           <table class="data-table"><thead><tr>
             <th>Rbr</th><th>Ticker</th><th>Datum</th><th class="num">Shares</th><th class="num">Cena</th><th>Valuta</th><th class="num">Srednji kurs</th><th class="num">Vrednost (RSD)</th>
@@ -1239,10 +1240,10 @@
 
         html += `</tbody></table>
           </div>
-        </div>`;
+        </details></div>`;
 
-        html += `<div class="summary-section">
-          <h3 style="font-size:1rem; margin-bottom:0.6rem;">Detaljan pregled kupovina (FIFO korišćeno)</h3>
+        html += `<div class="summary-section"><details>
+          <summary>Detaljan pregled kupovina (FIFO korišćeno)</summary>
           <div class="data-table-wrap" style="display:block;">
           <table class="data-table"><thead><tr>
             <th>Rbr</th><th>Ticker</th><th>Datum</th><th class="num">Shares</th><th class="num">Cena</th><th>Valuta</th><th class="num">Srednji kurs</th><th class="num">Vrednost (RSD)</th>
@@ -1263,11 +1264,41 @@
 
         html += `</tbody></table>
           </div>
-        </div>`;
+        </details></div>`;
       }
 
       list.innerHTML = html;
       card.style.display = 'block';
+    }
+
+    // ─── Load example data ─────────────────────────────────────────────────
+    function loadExample() {
+      // Switch to offline mode so it works without server
+      document.getElementById('offlineMode').checked = true;
+      document.getElementById('offlineMode').dispatchEvent(new Event('change'));
+
+      // Filing info
+      document.getElementById('filingDate').value = '2026-01-30';
+      document.getElementById('year').value = '2025';
+      document.getElementById('half').value = 'H2';
+      document.getElementById('vrstaPrijave').value = '1';
+      document.getElementById('osnovZaPrijavu').value = '4';
+
+      // Sample CSV data
+      document.getElementById('salesCsv').value =
+        'datum,ticker,shares,price,currency,srednji_kurs\n' +
+        '2025-09-15,VWCE,50,130.25,EUR,117.10\n' +
+        '2025-11-20,CSPX,20,580.00,USD,108.50';
+
+      document.getElementById('purchasesCsv').value =
+        'datum,ticker,shares,price,currency,srednji_kurs\n' +
+        '2023-03-10,VWCE,30,98.50,EUR,117.30\n' +
+        '2024-01-15,VWCE,25,110.75,EUR,117.05\n' +
+        '2024-06-20,CSPX,25,510.00,USD,107.80';
+
+      // Trigger date recalculation
+      updateDates();
+      showToast('Primer je učitan. Kliknite „Generiši XML" za kreiranje prijave.', 'success');
     }
 
     // ─── Download CSV template ───────────────────────────────────────────────
