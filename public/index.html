@@ -656,6 +656,11 @@
     </footer>
   </div>
 
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
   <script src="offline-core.js"></script>
   <script>
     let generatedXml = null;
