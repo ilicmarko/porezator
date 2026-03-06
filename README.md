@@ -81,9 +81,13 @@ public/offline-core.js — Offline engine za generisanje XML-a na klijentu
 primer.xml           — Primer generisanog XML fajla
 ```
 
+## Zahvalnice
+
+Podaci o kursu valuta preuzeti sa [kurs.resenje.org](https://kurs.resenje.org) — autor **Janoš Guljaš** ([@janos](https://github.com/janos)).
+
 ## Napomene
 
 - Ovo nije zvaničan alat državnih organa — koristi se na sopstvenu odgovornost
 - Aplikacija ne skladišti podatke niti koristi telemetriju
 - Server se koristi isključivo za preuzimanje kursa valute
-- Kod je otvorenog tipa (open source)
+- Kod je otvorenog tipa (open source) — [github.com/ilicmarko/porezator](https://github.com/ilicmarko/porezator)

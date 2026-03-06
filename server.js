@@ -4,7 +4,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static(path.join(__dirname, 'public')));
+if (!process.env.VERCEL) {
+  app.use(express.static(path.join(__dirname, 'public')));
+}
 
 const DEFAULT_PERSONAL_DATA = {
   tipPoreskogObveznika: '1',
@@ -353,118 +355,6 @@ app.post('/api/generate', async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ─── PDF Filling Helpers ────────────────────────────────────────────────────────
-// Splits string into characters and fills consecutive PDF fields
-function fillCharacterFields(form, basePattern, startIndex, text, maxLength = 99) {
-  const chars = text.toString().slice(0, maxLength).split('');
-  for (let i = 0; i < chars.length; i++) {
-    const fieldName = `${basePattern}[${startIndex + i}]`;
-    try {
-      const field = form.getTextField(fieldName);
-      field.setText(chars[i]);
-    } catch (err) {
-      // Field might not exist, skip silently
-    }
-  }
-}
-
-async function fillPdf({ year, half, filingDate, purchasesCsv, salesCsv, force, fieldMappings, personalData }) {
-  const pd = mergePersonalData(personalData);
-  // Load the blank PDF
-  const pdfBytes = fs.readFileSync('./8940_ID.pdf');
-  const pdfDoc = await PDFDocument.load(pdfBytes);
-  const form = pdfDoc.getForm();
-
-  // Get the same data as XML generation
-  const purchases = aggregateByTickerDate(parseCsv(purchasesCsv));
-  const sales = aggregateByTickerDate(parseCsv(salesCsv));
-  const matched = fifoMatch(purchases, sales, force);
-
-  // Calculate dates
-  const parsedYr = parseInt(year, 10);
-  const fullYear = parsedYr < 100 ? (2000 + parsedYr) : parsedYr;
-  let datumOstvarenja, datumDospelosti;
-  if (half === 'H2') {
-    datumOstvarenja = `${fullYear}-12-31`;
-    datumDospelosti = `${fullYear + 1}-01-31`;
-  } else {
-    datumOstvarenja = `${fullYear}-06-30`;
-    datumDospelosti = `${fullYear}-07-31`;
-  }
-
-  // Apply custom field mappings if provided
-  if (fieldMappings) {
-    for (const [fieldName, value] of Object.entries(fieldMappings)) {
-      try {
-        const field = form.getTextField(fieldName);
-        field.setText(String(value));
-      } catch (err) {
-        console.warn(`Field ${fieldName} not found or not a text field`);
-      }
-    }
-  }
-
-  // Auto-fill basic personal info (using Page1 fields - adjust indices as needed)
-  // These are example mappings - you'll need to adjust based on actual PDF layout
-  try {
-    // JMBG (assuming it starts at TextField1[0] on Page1)
-    fillCharacterFields(form, 'topmostSubform[0].Page1[0].TextField1', 0, pd.jmbg, 13);
-
-    // Filing date (assuming TextField1[13-22])
-    fillCharacterFields(form, 'topmostSubform[0].Page1[0].TextField1', 13, filingDate.replace(/-/g, ''), 10);
-  } catch (err) {
-    console.error('Error filling basic fields:', err.message);
-  }
-
-  // Flatten form to prevent further editing
-  // form.flatten();
-
-  const filledPdfBytes = await pdfDoc.save();
-  return Buffer.from(filledPdfBytes);
-}
-
-// ─── Fill PDF endpoint ──────────────────────────────────────────────────────────
-app.post('/api/fill-pdf', async (req, res) => {
-  try {
-    const { year, half, filingDate, purchasesCsv, salesCsv, force, fieldMappings, personalData } = req.body;
-
-    if (!year || !half || !filingDate || !purchasesCsv || !salesCsv) {
-      return res.status(400).json({ error: 'Sva polja su obavezna.' });
-    }
-
-    const pdfBuffer = await fillPdf({
-      year, half, filingDate, purchasesCsv, salesCsv, force: !!force, fieldMappings, personalData
-    });
-
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename="poreska_prijava_filled.pdf"');
-    res.send(pdfBuffer);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ─── Get PDF field names (helper endpoint) ──────────────────────────────────────
-app.get('/api/pdf-fields', async (req, res) => {
-  try {
-    const pdfBytes = fs.readFileSync('./8940_ID.pdf');
-    const pdfDoc = await PDFDocument.load(pdfBytes);
-    const form = pdfDoc.getForm();
-    const fields = form.getFields();
-
-    const fieldNames = fields.map((field, i) => ({
-      index: i + 1,
-      name: field.getName(),
-      type: field.constructor.name
-    }));
-
-    res.json({ total: fields.length, fields: fieldNames });
-  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
