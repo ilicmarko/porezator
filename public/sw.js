@@ -1,4 +1,4 @@
-const CACHE_NAME = 'porezator-v1';
+const CACHE_NAME = 'porezator-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -6,6 +6,7 @@ const STATIC_ASSETS = [
   '/favicon.ico',
   '/favicon.svg',
   '/favicon-96x96.png',
+  '/robots.txt',
 ];
 
 self.addEventListener('install', (event) => {
