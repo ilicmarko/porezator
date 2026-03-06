@@ -11,8 +11,8 @@
     :root {
       --bg: #f5f5f5;
       --card: #fff;
-      --accent: #1a73e8;
-      --accent-hover: #1558b0;
+      --accent: #1558b0;
+      --accent-hover: #0d3f82;
       --border: #ddd;
       --text: #333;
       --muted: #666;
@@ -141,10 +141,20 @@
       transition: border-color 0.15s;
     }
 
-    input:focus, select:focus, textarea:focus {
-      outline: none;
+    input:focus-visible, select:focus-visible, textarea:focus-visible {
       border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15);
+      box-shadow: 0 0 0 2px rgba(21, 88, 176, 0.25);
+      outline: 2px solid #000;
+      outline-offset: 1px;
+    }
+
+    :focus-visible {
+      outline: 2px solid #000;
+      outline-offset: 2px;
+    }
+
+    :focus:not(:focus-visible) {
+      outline: none;
     }
 
     textarea {
@@ -474,7 +484,7 @@
   </style>
 </head>
 <body>
-  <div class="container">
+  <main class="container">
     <div class="disclaimer">
       ⚠️ Ovo nije zvaničan alat državnih organa i koristi se na sopstvenu odgovornost. Aplikacija ne skladišti vaše podatke niti koristi telemetriju. Kod je otvorenog tipa (open source). Server se koristi isključivo za preuzimanje kursa valute.
     </div>
@@ -654,7 +664,7 @@
       <br>
       Izvorni kod dostupan na <a href="https://github.com/ilicmarko/porezator" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">GitHub-u</a>.
     </footer>
-  </div>
+  </main>
 
   <script>
     if ('serviceWorker' in navigator) {
