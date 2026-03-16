@@ -292,6 +292,38 @@
     }
     .toast-success .toast-close { color: var(--success); }
 
+    .update-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding: 0.95rem 1rem;
+      border: 1px solid #f3c37a;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, #fff8e8 0%, #fff2cc 100%);
+      color: #6a4a06;
+    }
+
+    .update-banner.is-visible {
+      display: flex;
+    }
+
+    .update-banner strong {
+      display: block;
+      margin-bottom: 0.15rem;
+    }
+
+    .update-banner p {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .update-banner .btn {
+      flex: 0 0 auto;
+    }
+
     @keyframes toast-in {
       from { opacity: 0; transform: translateX(40px); }
       to   { opacity: 1; transform: translateX(0); }
@@ -674,6 +706,10 @@
       .step-nav { flex-direction: column; }
       .step-nav .btn,
       .step-nav .step-nav-spacer { width: 100%; }
+      .update-banner {
+        flex-direction: column;
+        align-items: stretch;
+      }
     }
 
     @media (min-width: 641px) {
@@ -697,6 +733,13 @@
     </div>
 
     <div id="toastContainer" class="toast-container"></div>
+    <div id="updateBanner" class="update-banner" role="status" aria-live="polite">
+      <div>
+        <strong>Dostupna je nova verzija Porezatora</strong>
+        <p>Osvežite stranicu da biste učitali najnovije izmene i assete.</p>
+      </div>
+      <button type="button" class="btn btn-sm" onclick="applyServiceWorkerUpdate()">Osveži sada</button>
+    </div>
 
     <div class="stepper" id="stepperNav" aria-label="Koraci kroz prijavu">
       <button class="stepper-item is-active" type="button" data-step="0" onclick="goToStep(0)">
@@ -999,11 +1042,6 @@
     </footer>
   </main>
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js');
-    }
-  </script>
   <script src="offline-core.js"></script>
   <script>
     let generatedXml = null;
@@ -1012,6 +1050,63 @@
     const TOTAL_STEPS = 5;
     const LOCAL_STORAGE_KEY = 'porezator_form_v1';
     let autosaveTimeout = null;
+    let swRegistration = null;
+    let isReloadingForUpdate = false;
+
+    function showUpdateBanner() {
+      document.getElementById('updateBanner').classList.add('is-visible');
+    }
+
+    function hideUpdateBanner() {
+      document.getElementById('updateBanner').classList.remove('is-visible');
+    }
+
+    function applyServiceWorkerUpdate() {
+      if (swRegistration && swRegistration.waiting) {
+        swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        return;
+      }
+
+      window.location.reload();
+    }
+
+    async function registerServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+
+      try {
+        swRegistration = await navigator.serviceWorker.register('/sw.js');
+
+        const promptForWaitingWorker = () => {
+          if (swRegistration && swRegistration.waiting && navigator.serviceWorker.controller) {
+            showUpdateBanner();
+          }
+        };
+
+        promptForWaitingWorker();
+
+        swRegistration.addEventListener('updatefound', () => {
+          const newWorker = swRegistration.installing;
+          if (!newWorker) return;
+
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              showUpdateBanner();
+            }
+          });
+        });
+
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (isReloadingForUpdate) return;
+          isReloadingForUpdate = true;
+          hideUpdateBanner();
+          window.location.reload();
+        });
+      } catch (error) {
+        console.error('Service worker registration failed', error);
+      }
+    }
+
+    registerServiceWorker();
 
     function goToStep(step, options = {}) {
       const { refresh = true } = options;
