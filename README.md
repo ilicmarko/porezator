@@ -6,12 +6,12 @@ Generator poreske prijave za prenos hartija od vrednosti (PPDG-3R) iz CSV podata
 
 - Generisanje XML fajla u formatu za e-Poreze (PPDG-3R)
 - FIFO uparivanje kupovina i prodaja
-- Automatsko preuzimanje srednjeg kursa NBS (kurs.resenje.org)
+- Automatsko preuzimanje srednjeg kursa NBS (kurs.resenje.org) na zahtev iz koraka Pregled
 - Agregacija transakcija po tikeru i datumu sa ponderisanom cenom
 - Validacija pokrivenosti prodaja kupovinama
 - Zbirni finansijski pregled sa procenjenim porezom (15%)
 - Lista potrebne dokumentacije
-- Offline režim — bez slanja podataka serveru (zahteva kolonu `srednji_kurs` u CSV-u)
+- Lokalno generisanje XML-a u pregledaču
 - Automatsko čuvanje unetih podataka u pregledač (localStorage)
 - Mobilni prikaz
 
@@ -26,11 +26,12 @@ Aplikacija je dostupna na `http://localhost:3000`.
 
 ## Korišćenje
 
-### 1. Režim rada
+### 1. Lokalni režim
 
-Na vrhu stranice izaberite Online ili Offline režim:
-- **Online** — server preuzima srednji kurs NBS za svaki datum transakcije
-- **Offline** — ništa se ne šalje serveru, ali CSV mora sadržati kolonu `srednji_kurs`
+Porezator sada radi lokalno po defaultu:
+- XML se generiše direktno u pregledaču
+- Server se koristi samo kada u koraku **Pregled** kliknete na preuzimanje srednjih kurseva
+- Kolonu `srednji_kurs` možete uneti ručno ili je automatski popuniti u pregledu
 
 ### 2. Podaci o prijavi
 
@@ -47,7 +48,7 @@ datum,ticker,shares,price,currency,srednji_kurs
 2025-11-25,VWCE,85,142.38,EUR,117.25
 ```
 
-Kolona `srednji_kurs` je opciona u online režimu, obavezna u offline režimu.
+Kolona `srednji_kurs` može biti prazna pri unosu, ali mora biti popunjena pre generisanja XML-a.
 
 Podržani formati:
 - Zarez kao separator (CSV)
@@ -61,7 +62,13 @@ Kliknite **„Učitaj tabelu"** da vidite:
 - Proveru da li kupovine pokrivaju prodaje (FIFO)
 - Upozorenja za transakcije sa manje od 1 akcije
 
-### 5. Generisanje XML
+### 5. Pregled i kursevi
+
+U koraku **Pregled** možete:
+- ručno uneti `srednji_kurs` za svaki red
+- kliknuti na **„Preuzmi srednje kurseve sa servera"** da automatski popunite sve unete datume i valute
+
+### 6. Generisanje XML
 
 Kliknite **„Generiši XML"** za kreiranje poreske prijave.
 
@@ -75,11 +82,16 @@ Nakon generisanja prikazuju se:
 ## Struktura projekta
 
 ```
-server.js            — Express server, API za generisanje XML-a i preuzimanje kursa
+server.js            — Express server, API za preuzimanje kursa
 public/index.html    — Korisničko sučelje
-public/offline-core.js — Offline engine za generisanje XML-a na klijentu
+public/offline-core.js — Engine za generisanje XML-a na klijentu
 primer.xml           — Primer generisanog XML fajla
 ```
+
+## Primeri test podataka
+
+Anonimizovani IBKR primeri za testiranje importa nalaze se u `examples/ibkr-dummy/`.
+Set sadrži tri godišnja izveštaja koja zajedno prolaze validaciju, ali namerno prijavljuju FIFO greške ako izostavite jednu od godina kupovine.
 
 ## Zahvalnice
 

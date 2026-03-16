@@ -119,10 +119,54 @@
     return parsed < 100 ? 2000 + parsed : parsed;
   }
 
+  function formatSharesForNote(value) {
+    return new Intl.NumberFormat('sr-RS', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 4,
+      useGrouping: false,
+    }).format(Number(value.toFixed(4)));
+  }
+
+  function getRoundedDisplayShares(value) {
+    if (!Number.isFinite(value) || value <= 0) return 0;
+    return Math.max(1, Math.round(value));
+  }
+
+  function buildSharePresentation(actualShares, roundShares) {
+    const displayShares = roundShares ? getRoundedDisplayShares(actualShares) : actualShares;
+    return {
+      actualShares,
+      displayShares,
+      wasRounded: roundShares && Math.abs(displayShares - actualShares) > 0.0001,
+    };
+  }
+
+  function buildSalePresentation(sale, matchedLots, roundShares) {
+    const lotPresentations = matchedLots.map((lot) => ({
+      ...lot,
+      ...buildSharePresentation(lot.shares, roundShares),
+    }));
+    const saleDisplayShares = roundShares
+      ? lotPresentations.reduce((sum, lot) => sum + lot.displayShares, 0)
+      : sale.shares;
+    const saleWasRounded = roundShares && Math.abs(saleDisplayShares - sale.shares) > 0.0001;
+    const tickerLabel = saleWasRounded
+      ? `${sale.ticker} (preneto ukupno ${formatSharesForNote(sale.shares)} akcija, zbog zaokruživanja prikazano ${saleDisplayShares})`
+      : sale.ticker;
+
+    return {
+      tickerLabel,
+      saleDisplayShares,
+      saleWasRounded,
+      lotPresentations,
+    };
+  }
+
   function generateXmlOffline(body) {
     const fullYear = yearToFull(body.year);
     if (!fullYear) throw new Error('Neispravna godina prodaje.');
 
+    const pfx = body.docPrefix ? `${body.docPrefix}_` : '';
     const purchases = aggregateRows(parseCsvByMode(body.purchasesCsv, true), true);
     const sales = aggregateRows(parseCsvByMode(body.salesCsv, true), true);
     if (!sales.length) throw new Error('Nema prodaja u CSV-u.');
@@ -149,20 +193,24 @@
       redniBroj++;
       const saleRate = sale.exchangeRate || 1;
       const saleRsd = sale.shares * sale.price * saleRate;
-      const saleDateCompact = sale.date.replace(/-/g, '');
+      const saleDateCompact = pfx + sale.date.replace(/-/g, '');
+      const presentation = buildSalePresentation(sale, matchedLots, !!body.roundShares);
       let saleBoughtRsd = 0;
 
       let sticanjaXml = '';
-      for (const lot of matchedLots) {
+      for (const lot of presentation.lotPresentations) {
         const lotRate = lot.exchangeRate || 1;
         const lotRsd = lot.shares * lot.price * lotRate;
         saleBoughtRsd += lotRsd;
-        const lotDateCompact = lot.date.replace(/-/g, '');
+        const lotDateCompact = pfx + lot.date.replace(/-/g, '');
+        const lotDocNumber = lot.wasRounded
+          ? `${lotDateCompact} (stečeno ${formatSharesForNote(lot.actualShares)} zaokruženo ${lot.displayShares})`
+          : lotDateCompact;
         sticanjaXml += `
             <ns1:Sticanje>
                 <ns1:DatumSticanja>${lot.date}</ns1:DatumSticanja>
-                <ns1:BrojDokumentaOSticanju>${lotDateCompact}</ns1:BrojDokumentaOSticanju>
-                <ns1:BrojStecenihHOVInvesticionihJed>${lot.shares}</ns1:BrojStecenihHOVInvesticionihJed>
+                <ns1:BrojDokumentaOSticanju>${lotDocNumber}</ns1:BrojDokumentaOSticanju>
+                <ns1:BrojStecenihHOVInvesticionihJed>${lot.displayShares}</ns1:BrojStecenihHOVInvesticionihJed>
                 <ns1:NabavnaCena>${lotRsd.toFixed(2)}</ns1:NabavnaCena>
             </ns1:Sticanje>`;
 
@@ -181,10 +229,10 @@
       entriesXml += `
         <ns1:PodaciOPrenosuHOVInvesticionihJed>
             <ns1:RedniBroj>${redniBroj}</ns1:RedniBroj>
-            <ns1:NazivEmitenta><![CDATA[${sale.ticker}]]></ns1:NazivEmitenta>
+            <ns1:NazivEmitenta><![CDATA[${presentation.tickerLabel}]]></ns1:NazivEmitenta>
             <ns1:DatumPrenosaHOV>${sale.date}</ns1:DatumPrenosaHOV>
             <ns1:BrojDokumentaOPrenosu>${saleDateCompact}</ns1:BrojDokumentaOPrenosu>
-            <ns1:BrojPrenetihHOVInvesticionihJed>${sale.shares}</ns1:BrojPrenetihHOVInvesticionihJed>
+            <ns1:BrojPrenetihHOVInvesticionihJed>${presentation.saleDisplayShares}</ns1:BrojPrenetihHOVInvesticionihJed>
             <ns1:ProdajnaCena>${saleRsd.toFixed(2)}</ns1:ProdajnaCena>${sticanjaXml}
         </ns1:PodaciOPrenosuHOVInvesticionihJed>`;
 
@@ -213,10 +261,18 @@
         valueRsd: Number(saleRsd.toFixed(2)),
       });
 
-      documents.push({ type: 'Prodaja', ticker: sale.ticker, date: sale.date, docNumber: saleDateCompact, shares: sale.shares });
-      for (const lot of matchedLots) {
-        const lotDateCompact = lot.date.replace(/-/g, '');
-        documents.push({ type: 'Kupovina', ticker: sale.ticker, date: lot.date, docNumber: lotDateCompact, shares: lot.shares });
+      documents.push({ type: 'Prodaja', ticker: sale.ticker, date: sale.date, docNumber: saleDateCompact, shares: presentation.saleDisplayShares });
+      for (const lot of presentation.lotPresentations) {
+        const lotDateCompact = pfx + lot.date.replace(/-/g, '');
+        documents.push({
+          type: 'Kupovina',
+          ticker: sale.ticker,
+          date: lot.date,
+          docNumber: lot.wasRounded
+            ? `${lotDateCompact} (stečeno ${formatSharesForNote(lot.actualShares)} zaokruženo ${lot.displayShares})`
+            : lotDateCompact,
+          shares: lot.displayShares,
+        });
       }
     }
 

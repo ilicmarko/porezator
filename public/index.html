@@ -105,6 +105,15 @@
       margin-bottom: 0.8rem;
     }
 
+    .disclaimer a {
+      color: #8a5b00;
+      font-weight: 600;
+    }
+
+    .disclaimer strong {
+      color: #5c3f08;
+    }
+
     .card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -369,6 +378,20 @@
       font-size: 0.82rem;
     }
 
+    .data-table-compact {
+      min-width: 0;
+      table-layout: auto;
+    }
+
+    .table-rate-input {
+      width: 7.5rem;
+      min-width: 7.5rem;
+      padding: 0.3rem 0.45rem;
+      font-size: 0.82rem;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
     .summary-section {
       margin-top: 1rem;
       border-top: 1px solid var(--border);
@@ -414,6 +437,10 @@
       font-weight: 600;
     }
 
+    .alert {
+        padding: 0.7rem 0.9rem;
+    }
+
     .alert-warning {
       background: #fef7e0;
       color: #b45309;
@@ -443,6 +470,155 @@
       font-size: 0.83rem;
       color: #204170;
       line-height: 1.4;
+    }
+
+    .stepper {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-top: 0.2rem;
+      padding-bottom: 0.35rem;
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+    }
+
+    .stepper::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .stepper::-webkit-scrollbar-thumb {
+      background: #c9cdd3;
+      border-radius: 999px;
+    }
+
+    .stepper-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      width: auto;
+      min-width: 145px;
+      flex: 0 0 145px;
+      padding: 0.85rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: #fff;
+      color: inherit;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+    }
+
+    .stepper-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .stepper-item.is-active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(21, 88, 176, 0.14);
+      background: #f7fbff;
+    }
+
+    .stepper-item.is-complete .stepper-number {
+      background: var(--success);
+      border-color: var(--success);
+      color: #fff;
+    }
+
+    .stepper-number {
+      flex: 0 0 auto;
+      width: 1.9rem;
+      height: 1.9rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #f5f7f9;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .stepper-copy {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .stepper-copy strong {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .wizard-step {
+      display: none;
+      margin-bottom: 1.5rem;
+    }
+
+    .wizard-step.is-active {
+      display: block;
+    }
+
+    .step-intro {
+      margin-bottom: 1rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .step-nav {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: space-between;
+      margin-top: 1rem;
+    }
+
+    .step-nav .btn {
+      width: auto;
+      flex: 0 0 auto;
+    }
+
+    .step-nav .step-nav-spacer {
+      flex: 1;
+    }
+
+    .import-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .import-panel {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      background: #fbfbfb;
+    }
+
+    .import-panel[hidden] {
+      display: none;
+    }
+
+    .preview-section {
+      margin-top: 1rem;
+    }
+
+    .preview-section h3 {
+      font-size: 0.98rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .empty-state {
+      padding: 1rem;
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      background: #fafafa;
+      font-size: 0.88rem;
     }
 
     /* Collapsible card */
@@ -477,12 +653,27 @@
     /* Mobile responsive */
     @media (max-width: 640px) {
       body { padding: 1rem; }
+      .stepper {
+        display: grid;
+        grid-template-columns: 1fr;
+        overflow: visible;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+      .stepper-item {
+        width: 100%;
+        min-width: 0;
+        flex: initial;
+      }
       .form-row { flex-wrap: wrap; }
       .form-row .form-group { min-width: 100%; }
       .actions { flex-direction: column; }
       .actions .btn { width: 100%; }
       .computed-dates { flex-direction: column; gap: 0.3rem; }
       h1 { font-size: 1.4rem; }
+      .step-nav { flex-direction: column; }
+      .step-nav .btn,
+      .step-nav .step-nav-spacer { width: 100%; }
     }
 
     @media (min-width: 641px) {
@@ -493,7 +684,7 @@
 <body>
   <main class="container">
     <div class="disclaimer">
-      ⚠️ Ovo nije zvaničan alat državnih organa i koristi se na sopstvenu odgovornost. Aplikacija ne skladišti vaše podatke niti koristi telemetriju. Kod je otvorenog tipa (open source). Server se koristi isključivo za preuzimanje kursa valute.
+      <strong>Napomena:</strong> ovo nije zvaničan alat državnih organa i koristi se na sopstvenu odgovornost. Aplikacija ne skladišti vaše podatke niti koristi telemetriju, a server se koristi isključivo za preuzimanje kursa valute. Ako primetite grešku ili problem, prijavite kroz <a href="https://github.com/ilicmarko/porezator/issues/new" target="_blank" rel="noopener noreferrer">GitHub issue</a> ili pošaljite <a href="https://github.com/ilicmarko/porezator/pulls" target="_blank" rel="noopener noreferrer">pull request</a>.
     </div>
     <h1>📋 Porezator</h1>
     <p class="subtitle">Generator poreske prijave za prenos HOV (PPDG-3R)</p>
@@ -507,164 +698,290 @@
 
     <div id="toastContainer" class="toast-container"></div>
 
-    <div class="card">
-      <h2>Režim rada</h2>
-      <label style="display:flex; align-items:center; gap:0.45rem; color:var(--text); font-weight:normal; margin-bottom:0.5rem;">
-        <input id="offlineMode" type="checkbox" style="width:auto;">
-        Offline mode (bez slanja podataka na server)
-      </label>
-      <div class="mode-note" id="modeNote" style="margin-top:0;">
-        Online mode: podaci se šalju serveru radi obračuna kursa i generisanja XML.<br>
-        Offline mode: ništa se ne šalje serveru, CSV podržava dodatnu kolonu <strong>srednji_kurs</strong> po redu (format: datum,ticker,shares,price,currency,srednji_kurs).
-      </div>
-      <button class="btn btn-sm btn-outline" style="margin-top:0.75rem;" onclick="loadExample()">📝 Generiši primer</button>
+    <div class="stepper" id="stepperNav" aria-label="Koraci kroz prijavu">
+      <button class="stepper-item is-active" type="button" data-step="0" onclick="goToStep(0)">
+        <span class="stepper-number">0</span>
+        <span class="stepper-copy"><strong>Podešavanja</strong></span>
+      </button>
+      <button class="stepper-item" type="button" data-step="1" onclick="goToStep(1)">
+        <span class="stepper-number">1</span>
+        <span class="stepper-copy"><strong>Lični podaci</strong></span>
+      </button>
+      <button class="stepper-item" type="button" data-step="2" onclick="goToStep(2)">
+        <span class="stepper-number">2</span>
+        <span class="stepper-copy"><strong>Uvoz</strong></span>
+      </button>
+      <button class="stepper-item" type="button" data-step="3" onclick="goToStep(3)">
+        <span class="stepper-number">3</span>
+        <span class="stepper-copy"><strong>Pregled</strong></span>
+      </button>
+      <button class="stepper-item" type="button" data-step="4" onclick="goToStep(4)">
+        <span class="stepper-number">4</span>
+        <span class="stepper-copy"><strong>Rezultat</strong></span>
+      </button>
     </div>
 
-    <div class="card">
-      <h2>Podaci o prijavi</h2>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="vrstaPrijave">Vrsta prijave</label>
-          <select id="vrstaPrijave">
-            <option value="1" selected>1 - Opšta prijava</option>
-            <option value="3">3 - Prijava po članu 182b ZPPPA</option>
-            <option value="6">6 - Prijava po članu 39. ZPPPA</option>
-          </select>
+    <section class="wizard-step is-active" id="step0" data-step="0">
+      <p class="step-intro">Aplikacija sada radi lokalno po defaultu. Server se koristi samo kada u pregledu ručno zatražite preuzimanje srednjih kurseva za unete datume.</p>
+      <div class="card">
+        <h2>Lokalni režim</h2>
+        <input id="offlineMode" type="checkbox" checked hidden>
+        <div class="mode-note" id="modeNote" style="margin-top:0;">
+          <strong>Podrazumevano lokalno:</strong> XML se generiše direktno u pregledaču i podaci se ne šalju serveru za obračun.<br>
+          Ako vam trebaju kursevi, u koraku <strong>Pregled</strong> možete jednim klikom preuzeti srednje kurseve sa servera za sve unete datume i automatski popuniti kolonu <strong>srednji_kurs</strong>.
+        </div>
+        <button class="btn btn-sm btn-outline" style="margin-top:0.75rem;" onclick="loadExample()">📝 Generiši primer</button>
+      </div>
+
+      <div class="card">
+        <h2>Podaci o prijavi</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="vrstaPrijave">Vrsta prijave</label>
+            <select id="vrstaPrijave">
+              <option value="1" selected>1 - Opšta prijava</option>
+              <option value="3">3 - Prijava po članu 182b ZPPPA</option>
+              <option value="6">6 - Prijava po članu 39. ZPPPA</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="osnovZaPrijavu">Osnov za prijavu</label>
+            <select id="osnovZaPrijavu">
+              <option value="1">1 - Prenos stvarnih prava na nepokretnosti</option>
+              <option value="2">2 - Prenos autorskih i srodnih prava i prava industrijske svojine</option>
+              <option value="3">3 - Prenos udela u kapitalu pravnih lica</option>
+              <option value="4" selected>4 - Prenos akcija i ostalih HoV, uključujući i investicione jedinice</option>
+              <option value="5">5 - Prodaja nepokretnosti sa pravom na poresko oslobođenje</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="filingDate">Datum prijave</label>
+            <input type="date" id="filingDate">
+          </div>
+          <div class="form-group">
+            <label for="year">Godina prodaje</label>
+            <input id="year" type="number" min="2000" max="2100" step="1" value="2025">
+          </div>
+          <div class="form-group">
+            <label for="half">Polugodište</label>
+            <select id="half">
+              <option value="H1">H1 (jan–jun)</option>
+              <option value="H2" selected>H2 (jul–dec)</option>
+            </select>
+          </div>
+        </div>
+        <div class="computed-dates" id="computedDates">
+          <span>Datum ostvarenja prihoda: <strong id="datumOstvarenja">–</strong></span>
+          <span>Dospelost: <strong id="datumDospelosti">–</strong></span>
         </div>
       </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="osnovZaPrijavu">Osnov za prijavu</label>
-          <select id="osnovZaPrijavu">
-            <option value="1">1 - Prenos stvarnih prava na nepokretnosti</option>
-            <option value="2">2 - Prenos autorskih i srodnih prava i prava industrijske svojine</option>
-            <option value="3">3 - Prenos udela u kapitalu pravnih lica</option>
-            <option value="4" selected>4 - Prenos akcija i ostalih HoV, uključujući i investicione jedinice</option>
-            <option value="5">5 - Prodaja nepokretnosti sa pravom na poresko oslobođenje</option>
-          </select>
-        </div>
+      <div class="step-nav">
+        <span class="step-nav-spacer"></span>
+        <button type="button" class="btn" onclick="goToStep(1)">Dalje: Lični podaci</button>
       </div>
+    </section>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="filingDate">Datum prijave</label>
-          <input type="date" id="filingDate">
+    <section class="wizard-step" id="step1" data-step="1">
+      <p class="step-intro">Ovde unesite lične podatke koji ulaze u XML. Ovaj korak je odvojen da se ne meša sa uvozom trgovina.</p>
+      <details class="card card-collapsible" id="personalDataCard" open>
+        <summary><h2>Lični podaci obveznika</h2></summary>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tipPoreskogObveznika">Tip poreskog obveznika</label>
+            <input id="tipPoreskogObveznika" value="1">
+          </div>
+          <div class="form-group">
+            <label for="poreskiIdentifikacioniBroj">PIB / JMBG</label>
+            <input id="poreskiIdentifikacioniBroj" placeholder="JMBG">
+          </div>
+          <div class="form-group">
+            <label for="jmbg">JMBG podnosioca</label>
+            <input id="jmbg" placeholder="JMBG">
+          </div>
         </div>
-        <div class="form-group">
-          <label for="year">Godina prodaje</label>
-          <input id="year" type="number" min="2000" max="2100" step="1" value="2025">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="imeIPrezime">Ime i prezime</label>
+            <input id="imeIPrezime" placeholder="IME PREZIME">
+          </div>
+          <div class="form-group">
+            <label for="prebivalisteSifra">Šifra prebivališta</label>
+            <input id="prebivalisteSifra" placeholder="000">
+          </div>
         </div>
-        <div class="form-group">
-          <label for="half">Polugodište</label>
-          <select id="half">
-            <option value="H1">H1 (jan–jun)</option>
-            <option value="H2" selected>H2 (jul–dec)</option>
-          </select>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="adresa">Adresa</label>
+            <input id="adresa" placeholder="Grad, Ulica i broj">
+          </div>
         </div>
-      </div>
-      <div class="computed-dates" id="computedDates">
-        <span>Datum ostvarenja prihoda: <strong id="datumOstvarenja">–</strong></span>
-        <span>Dospelost: <strong id="datumDospelosti">–</strong></span>
-      </div>
-    </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="telefon">Telefon</label>
+            <input id="telefon" placeholder="06X...">
+          </div>
+          <div class="form-group">
+            <label for="email">E-mail</label>
+            <input id="email" placeholder="email@primer.com">
+          </div>
+        </div>
+      </details>
 
-    <details class="card card-collapsible" id="personalDataCard" open>
-      <summary><h2>Lični podaci obveznika</h2></summary>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="tipPoreskogObveznika">Tip poreskog obveznika</label>
-          <input id="tipPoreskogObveznika" value="1">
-        </div>
-        <div class="form-group">
-          <label for="poreskiIdentifikacioniBroj">PIB / JMBG</label>
-          <input id="poreskiIdentifikacioniBroj" placeholder="JMBG">
-        </div>
-        <div class="form-group">
-          <label for="jmbg">JMBG podnosioca</label>
-          <input id="jmbg" placeholder="JMBG">
-        </div>
+      <div class="step-nav">
+        <button type="button" class="btn btn-outline" onclick="goToStep(0)">Nazad</button>
+        <span class="step-nav-spacer"></span>
+        <button type="button" class="btn" onclick="goToStep(2)">Dalje: Uvoz podataka</button>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="imeIPrezime">Ime i prezime</label>
-          <input id="imeIPrezime" placeholder="IME PREZIME">
-        </div>
-        <div class="form-group">
-          <label for="prebivalisteSifra">Šifra prebivališta</label>
-          <input id="prebivalisteSifra" placeholder="000">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="adresa">Adresa</label>
-          <input id="adresa" placeholder="Grad, Ulica i broj">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="telefon">Telefon</label>
-          <input id="telefon" placeholder="06X...">
-        </div>
-        <div class="form-group">
-          <label for="email">E-mail</label>
-          <input id="email" placeholder="email@primer.com">
-        </div>
-      </div>
-    </details>
+    </section>
 
-    <div class="card">
-      <h2>CSV prodaje</h2>
-      <div class="file-upload-wrap">
-        <textarea id="salesCsv" placeholder="datum,ticker,shares,price,currency,srednji_kurs
+    <section class="wizard-step" id="step2" data-step="2">
+      <p class="step-intro">Izaberite izvor podataka. Ako koristite IBKR import, ručni CSV unos se sakriva i aplikacija radi iz uvezenih transakcija.</p>
+      <div class="card" id="ibkrImportCard">
+        <h2 style="display:flex; align-items:center; gap:0.5rem;">Uvoz podataka</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="importMode">Izvor podataka</label>
+            <select id="importMode" onchange="toggleImportMode()">
+              <option value="csv" selected>Ručni unos (CSV)</option>
+              <option value="ibkr">IBKR Activity Statement</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="import-layout">
+          <div class="import-panel" id="manualCsvSection">
+            <div class="preview-section">
+              <h3>CSV prodaje</h3>
+              <div class="file-upload-wrap">
+                <textarea id="salesCsv" placeholder="datum,ticker,shares,price,currency,srednji_kurs
 2025-11-25,VWCE,85,142.38,EUR,117.25"></textarea>
-        <label class="csv-upload-label" for="salesCsvFile">Učitaj CSV fajl</label>
-        <input id="salesCsvFile" type="file" accept=".csv,.txt" onchange="loadFile(this, 'salesCsv')">
-      </div>
-      <p class="hint">Format: YYYY-MM-DD, Ticker, Shares, Price, Currency, Srednji_kurs (opciono za online, obavezno za offline) · <a href="#" onclick="downloadTemplate('sales'); return false;">Preuzmi template</a></p>
-      <button class="btn btn-sm btn-outline" onclick="loadTable('salesCsv', 'salesTable')">📋 Učitaj tabelu</button>
-      <div class="data-table-wrap" id="salesTable"></div>
-    </div>
+                <label class="csv-upload-label" for="salesCsvFile">Učitaj CSV fajl</label>
+                <input id="salesCsvFile" type="file" accept=".csv,.txt" onchange="loadFile(this, 'salesCsv')">
+              </div>
+              <p class="hint">Format: YYYY-MM-DD, Ticker, Shares, Price, Currency, Srednji_kurs · kurs možete uneti odmah ili kasnije popuniti u koraku Pregled. <a href="#" onclick="downloadTemplate('sales'); return false;">Preuzmi template</a></p>
+            </div>
 
-    <div class="card">
-      <h2>CSV kupovine</h2>
-      <div class="file-upload-wrap">
-        <textarea id="purchasesCsv" placeholder="datum,ticker,shares,price,currency,srednji_kurs
+            <div class="preview-section">
+              <h3>CSV kupovine</h3>
+              <div class="file-upload-wrap">
+                <textarea id="purchasesCsv" placeholder="datum,ticker,shares,price,currency,srednji_kurs
 2022-06-22,VWCE,8,89.50,EUR,117.00
 2022-07-06,VWCE,21,93.00,EUR,117.40"></textarea>
-        <label class="csv-upload-label" for="purchasesCsvFile">Učitaj CSV fajl</label>
-        <input id="purchasesCsvFile" type="file" accept=".csv,.txt" onchange="loadFile(this, 'purchasesCsv')">
+                <label class="csv-upload-label" for="purchasesCsvFile">Učitaj CSV fajl</label>
+                <input id="purchasesCsvFile" type="file" accept=".csv,.txt" onchange="loadFile(this, 'purchasesCsv')">
+              </div>
+              <p class="hint">Format: YYYY-MM-DD, Ticker, Shares, Price, Currency, Srednji_kurs · kurs možete uneti odmah ili kasnije popuniti u koraku Pregled. <a href="#" onclick="downloadTemplate('purchases'); return false;">Preuzmi template</a></p>
+            </div>
+          </div>
+
+          <div class="import-panel" id="ibkrImportSection" hidden>
+            <details style="margin-bottom:0.75rem; font-size:0.85rem; color:var(--muted); line-height:1.5;">
+              <summary style="cursor:pointer; font-weight:600; color:var(--text);">ℹ️ Kako preuzeti IBKR izveštaj</summary>
+              <ol style="margin-top:0.5rem; padding-left:1.2rem;">
+                <li>Ulogujte se na <strong>InteractiveBrokers</strong> veb-sajt</li>
+                <li>Idite na <strong>Performance &amp; Reports</strong> → <strong>Statements</strong></li>
+                <li>Kliknite na <strong>Activity</strong> izveštaj</li>
+                <li>Za Period izaberite <strong>Custom Date Range</strong></li>
+                <li>Izaberite datume za period u kojem ste izvršili sve trgovine</li>
+                <li>Za jezik izveštaja izaberite <strong>English</strong></li>
+                <li>Kliknite na <strong>Download</strong> dugme pored <strong>CSV</strong> opcije</li>
+              </ol>
+              <p style="margin-top:0.4rem;">Možete učitati više fajlova odjednom, a Porezator će ih spojiti u kupovine i prodaje.</p>
+            </details>
+            <div class="form-row">
+              <div class="form-group" style="flex:1;">
+                <label for="ibkrFiles">IBKR CSV fajlovi</label>
+                <input id="ibkrFiles" type="file" accept=".csv" multiple style="font-size:0.85rem;">
+              </div>
+            </div>
+            <div id="ibkrStatus" style="margin-top:0.75rem; font-size:0.85rem;"></div>
+          </div>
+        </div>
       </div>
-      <p class="hint">Format: YYYY-MM-DD, Ticker, Shares, Price, Currency, Srednji_kurs (opciono za online, obavezno za offline) · <a href="#" onclick="downloadTemplate('purchases'); return false;">Preuzmi template</a></p>
-      <button class="btn btn-sm btn-outline" onclick="loadTable('purchasesCsv', 'purchasesTable')">📋 Učitaj tabelu</button>
-      <div class="data-table-wrap" id="purchasesTable"></div>
-    </div>
 
-    <div class="validation-box" id="validationBox"></div>
+      <div class="step-nav">
+        <button type="button" class="btn btn-outline" onclick="goToStep(1)">Nazad</button>
+        <span class="step-nav-spacer"></span>
+        <button type="button" class="btn" onclick="proceedToPreviewStep()">Dalje: Pregled tabela</button>
+      </div>
+    </section>
 
-    <div class="force-override" id="forceOverride" style="display:none; margin-bottom: 1rem;">
-      <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; color:var(--text); font-weight:normal; font-size:0.9rem;">
-        <input type="checkbox" id="forceCheckbox" style="width:auto;">
-        Dozvoli generisanje bez potpunog pokrivanja kupovinama (force override)
-      </label>
-    </div>
+    <section class="wizard-step" id="step3" data-step="3">
+      <p class="step-intro">Ovde vidite šta će stvarno ući u obračun. Po potrebi ručno unesite srednji kurs po redu ili ga automatski preuzmite sa servera za sve datume odjednom.</p>
+      <div class="card">
+        <h2>Pregled transakcija</h2>
+        <div id="previewStatus" class="empty-state">Unesite ili uvezite podatke u prethodnom koraku, pa otvorite pregled.</div>
+        <div class="actions" style="margin-top:0.75rem;">
+          <button type="button" class="btn btn-outline btn-sm" id="prefillRatesBtn" onclick="prefillExchangeRates()">Preuzmi srednje kurseve sa servera</button>
+        </div>
 
-    <div class="actions">
-      <button class="btn" id="generateBtn" onclick="generate()">
-        Generiši XML
-      </button>
-      <button class="btn btn-outline" id="downloadBtn" onclick="downloadXml()" disabled>
-        Preuzmi XML
-      </button>
-    </div>
+        <div class="preview-section">
+          <h3>Prodaje</h3>
+          <div class="data-table-wrap" id="salesTable"></div>
+        </div>
 
-    <pre class="preview-box" id="preview"></pre>
+        <div class="preview-section">
+          <h3>Kupovine</h3>
+          <div class="data-table-wrap" id="purchasesTable"></div>
+        </div>
 
-    <div class="card" id="documentsCard" style="display:none; margin-top:1.5rem;">
-      <h2>Potrebna dokumentacija</h2>
-      <p style="font-size:0.85rem; color:var(--muted); margin-bottom:0.75rem;">Lista dokumenata koje treba priložiti uz poresku prijavu:</p>
-      <div id="documentsList"></div>
-    </div>
+        <div class="validation-box" id="validationBox"></div>
+
+        <div class="rounding-option" id="roundingOption" style="display:none; margin-top:1rem;">
+          <div class="alert alert-warning" style="margin:0;">
+            <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; color:var(--text); font-weight:600; font-size:0.95rem;">
+              <input type="checkbox" id="roundSharesCheckbox" style="width:auto;">
+              Zakruži brojeve
+            </label>
+            <p style="margin:0.65rem 0 0; font-size:0.88rem; line-height:1.55; color:var(--text);">
+              Ako ePorezi odbija XML zato što broj akcija sadrži decimalu, uključite ovu opciju. Porezator će u XML-u prikazati zaokružene količine, ali će prodajna i nabavna cena ostati obračunate po originalnim količinama. Uz ticker i dokument o sticanju biće dodata napomena o originalnoj i prikazanoj količini.
+            </p>
+          </div>
+        </div>
+
+        <div class="force-override" id="forceOverride" style="display:none; margin-top: 1rem;">
+          <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; color:var(--text); font-weight:normal; font-size:0.9rem;">
+            <input type="checkbox" id="forceCheckbox" style="width:auto;">
+            Dozvoli generisanje bez potpunog pokrivanja kupovinama (force override)
+          </label>
+        </div>
+      </div>
+
+      <div class="step-nav">
+        <button type="button" class="btn btn-outline" onclick="goToStep(2)">Nazad</button>
+        <span class="step-nav-spacer"></span>
+        <button class="btn" id="generateBtn" type="button" onclick="generate()">Generiši XML</button>
+      </div>
+    </section>
+
+    <section class="wizard-step" id="step4" data-step="4">
+      <p class="step-intro">Poslednji korak prikazuje generisani XML i listu dokumenata. Ako nešto nije dobro, vratite se na prethodne korake i generišite ponovo.</p>
+      <div class="card">
+        <h2>Generisani rezultat</h2>
+        <div id="resultsPlaceholder" class="empty-state">Rezultat će se pojaviti ovde nakon generisanja XML-a u prethodnom koraku.</div>
+        <pre class="preview-box" id="preview"></pre>
+      </div>
+
+      <div class="card" id="documentsCard" style="display:none; margin-top:1.5rem;">
+        <h2>Potrebna dokumentacija</h2>
+        <p style="font-size:0.85rem; color:var(--muted); margin-bottom:0.75rem;">Lista dokumenata koje treba priložiti uz poresku prijavu:</p>
+        <div id="documentsList"></div>
+      </div>
+
+      <div class="step-nav">
+        <button type="button" class="btn btn-outline" onclick="goToStep(3)">Nazad</button>
+        <button type="button" class="btn btn-outline" onclick="generate()">Ponovo generiši</button>
+        <span class="step-nav-spacer"></span>
+        <button class="btn btn-outline" id="downloadBtn" type="button" onclick="downloadXml()" disabled>Preuzmi XML</button>
+      </div>
+    </section>
 
     <footer style="margin-top:2.5rem; padding-top:1rem; border-top:1px solid var(--border); font-size:0.8rem; color:var(--muted); text-align:center; line-height:1.6;">
       Podaci o kursu valuta preuzeti sa <a href="https://kurs.resenje.org" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">kurs.resenje.org</a> — autor <strong>Janoš Guljaš</strong>.
@@ -690,8 +1007,79 @@
   <script src="offline-core.js"></script>
   <script>
     let generatedXml = null;
+    let ibkrAccountId = '';
+    let currentStep = 0;
+    const TOTAL_STEPS = 5;
     const LOCAL_STORAGE_KEY = 'porezator_form_v1';
     let autosaveTimeout = null;
+
+    function goToStep(step, options = {}) {
+      const { refresh = true } = options;
+      currentStep = Math.max(0, Math.min(TOTAL_STEPS - 1, step));
+
+      document.querySelectorAll('.wizard-step').forEach((section) => {
+        const isActive = Number(section.dataset.step) === currentStep;
+        section.classList.toggle('is-active', isActive);
+      });
+
+      document.querySelectorAll('.stepper-item').forEach((button) => {
+        const stepNo = Number(button.dataset.step);
+        button.classList.toggle('is-active', stepNo === currentStep);
+        button.classList.toggle('is-complete', stepNo < currentStep);
+        button.setAttribute('aria-current', stepNo === currentStep ? 'step' : 'false');
+      });
+
+      if (currentStep === 3 && refresh) {
+        refreshPreview(true);
+      }
+    }
+
+    function resetResultsState() {
+      generatedXml = null;
+      document.getElementById('preview').textContent = '';
+      document.getElementById('preview').style.display = 'none';
+      document.getElementById('resultsPlaceholder').style.display = 'block';
+      document.getElementById('downloadBtn').disabled = true;
+      document.getElementById('documentsCard').style.display = 'none';
+      document.getElementById('documentsList').innerHTML = '';
+    }
+
+    function updatePreviewStatus(hasSales, hasPurchases) {
+      const status = document.getElementById('previewStatus');
+      if (!hasSales && !hasPurchases) {
+        status.textContent = 'Unesite ili uvezite podatke u prethodnom koraku, pa otvorite pregled.';
+        status.style.display = 'block';
+        return;
+      }
+
+      const salesRows = parseCsvText(document.getElementById('salesCsv').value).length;
+      const purchaseRows = parseCsvText(document.getElementById('purchasesCsv').value).length;
+      status.textContent = `Pregled osvežen: ${purchaseRows} kupovina, ${salesRows} prodaja.`;
+      status.style.display = 'block';
+    }
+
+    async function proceedToPreviewStep() {
+      const importMode = document.getElementById('importMode').value;
+      if (importMode === 'ibkr') {
+        const fileInput = document.getElementById('ibkrFiles');
+        // Imported IBKR rows are written back into the hidden CSV fields so the rest
+        // of the app can keep using a single preview/generation pipeline.
+        const hasManualImportedRows = document.getElementById('salesCsv').value.trim() || document.getElementById('purchasesCsv').value.trim();
+
+        if (fileInput.files.length) {
+          const loaded = await loadIbkrFiles({
+            navigateToPreview: false,
+            silentSuccess: true,
+          });
+          if (!loaded) return;
+        } else if (!hasManualImportedRows) {
+          showAlert('Izaberite bar jedan IBKR CSV fajl pre prelaska na pregled.', 'error');
+          return;
+        }
+      }
+
+      goToStep(3);
+    }
 
     function setAutosaveIndicator(state, customText = '') {
       const dot = document.getElementById('autosaveDot');
@@ -711,7 +1099,7 @@
 
     function getFormState() {
       return {
-        offlineMode: document.getElementById('offlineMode').checked,
+        importMode: document.getElementById('importMode').value,
         vrstaPrijave: document.getElementById('vrstaPrijave').value,
         osnovZaPrijavu: document.getElementById('osnovZaPrijavu').value,
         year: document.getElementById('year').value,
@@ -730,6 +1118,8 @@
         salesCsv: document.getElementById('salesCsv').value,
         purchasesCsv: document.getElementById('purchasesCsv').value,
         force: document.getElementById('forceCheckbox').checked,
+        roundShares: document.getElementById('roundSharesCheckbox').checked,
+        ibkrAccountId,
       };
     }
 
@@ -754,7 +1144,8 @@
 
       try {
         const state = JSON.parse(raw);
-        document.getElementById('offlineMode').checked = !!state.offlineMode;
+        if (state.importMode) document.getElementById('importMode').value = state.importMode;
+        document.getElementById('offlineMode').checked = true;
         if (state.vrstaPrijave) document.getElementById('vrstaPrijave').value = state.vrstaPrijave;
         if (state.osnovZaPrijavu) document.getElementById('osnovZaPrijavu').value = state.osnovZaPrijavu;
         if (state.year) document.getElementById('year').value = state.year;
@@ -773,6 +1164,9 @@
         if (typeof state.salesCsv === 'string') document.getElementById('salesCsv').value = state.salesCsv;
         if (typeof state.purchasesCsv === 'string') document.getElementById('purchasesCsv').value = state.purchasesCsv;
         document.getElementById('forceCheckbox').checked = !!state.force;
+        document.getElementById('roundSharesCheckbox').checked = !!state.roundShares;
+        ibkrAccountId = typeof state.ibkrAccountId === 'string' ? state.ibkrAccountId : '';
+        toggleImportMode(false);
         setAutosaveIndicator('saved', 'Učitano iz lokalne memorije');
         return true;
       } catch (err) {
@@ -783,9 +1177,10 @@
 
     function clearSavedData() {
       localStorage.removeItem(LOCAL_STORAGE_KEY);
+      document.getElementById('importMode').value = 'csv';
       document.getElementById('vrstaPrijave').value = '1';
       document.getElementById('osnovZaPrijavu').value = '4';
-      document.getElementById('offlineMode').checked = false;
+      document.getElementById('offlineMode').checked = true;
       document.getElementById('year').value = new Date().getFullYear();
       document.getElementById('half').value = 'H2';
       document.getElementById('tipPoreskogObveznika').value = '1';
@@ -799,16 +1194,25 @@
       document.getElementById('salesCsv').value = '';
       document.getElementById('purchasesCsv').value = '';
       document.getElementById('forceCheckbox').checked = false;
+      document.getElementById('roundSharesCheckbox').checked = false;
+      document.getElementById('ibkrFiles').value = '';
+      document.getElementById('ibkrStatus').innerHTML = '';
       document.getElementById('filingDate').value = new Date().toISOString().split('T')[0];
+      ibkrAccountId = '';
       syncPeriodFromFilingDate();
 
       document.getElementById('salesTable').style.display = 'none';
       document.getElementById('purchasesTable').style.display = 'none';
       document.getElementById('validationBox').style.display = 'none';
+      document.getElementById('roundingOption').style.display = 'none';
       document.getElementById('forceOverride').style.display = 'none';
-      document.getElementById('preview').style.display = 'none';
-      document.getElementById('documentsCard').style.display = 'none';
-      document.getElementById('downloadBtn').disabled = true;
+      document.getElementById('validationBox').innerHTML = '';
+      document.getElementById('salesTable').innerHTML = '';
+      document.getElementById('purchasesTable').innerHTML = '';
+      document.getElementById('previewStatus').textContent = 'Unesite ili uvezite podatke u prethodnom koraku, pa otvorite pregled.';
+      toggleImportMode(false);
+      resetResultsState();
+      goToStep(0, { refresh: false });
 
       updateDates();
       setAutosaveIndicator('idle', 'Sačuvani podaci obrisani');
@@ -864,7 +1268,7 @@
     document.getElementById('filingDate').addEventListener('change', syncPeriodFromFilingDate);
 
     const autosaveBindings = [
-      { id: 'offlineMode', event: 'change' },
+      { id: 'importMode', event: 'change' },
       { id: 'vrstaPrijave', event: 'change' },
       { id: 'osnovZaPrijavu', event: 'change' },
       { id: 'year', event: 'input' },
@@ -881,17 +1285,45 @@
       { id: 'salesCsv', event: 'input' },
       { id: 'purchasesCsv', event: 'input' },
       { id: 'forceCheckbox', event: 'change' },
+      { id: 'roundSharesCheckbox', event: 'change' },
     ];
     autosaveBindings.forEach(({ id, event }) => {
       document.getElementById(id).addEventListener(event, scheduleAutosave);
     });
 
+    const invalidateBindings = [
+      { id: 'importMode', event: 'change' },
+      { id: 'vrstaPrijave', event: 'change' },
+      { id: 'osnovZaPrijavu', event: 'change' },
+      { id: 'year', event: 'input' },
+      { id: 'half', event: 'change' },
+      { id: 'filingDate', event: 'change' },
+      { id: 'tipPoreskogObveznika', event: 'input' },
+      { id: 'poreskiIdentifikacioniBroj', event: 'input' },
+      { id: 'imeIPrezime', event: 'input' },
+      { id: 'prebivalisteSifra', event: 'input' },
+      { id: 'adresa', event: 'input' },
+      { id: 'telefon', event: 'input' },
+      { id: 'email', event: 'input' },
+      { id: 'jmbg', event: 'input' },
+      { id: 'salesCsv', event: 'input' },
+      { id: 'purchasesCsv', event: 'input' },
+      { id: 'forceCheckbox', event: 'change' },
+      { id: 'roundSharesCheckbox', event: 'change' },
+    ];
+    invalidateBindings.forEach(({ id, event }) => {
+      document.getElementById(id).addEventListener(event, resetResultsState);
+    });
+
     const loaded = loadSavedData();
     if (!loaded) {
       syncPeriodFromFilingDate();
+      toggleImportMode(false);
     }
     updateDates();
     if (!loaded) setAutosaveIndicator('idle', 'Nema sačuvanih podataka');
+    resetResultsState();
+    goToStep(0, { refresh: false });
 
     // ─── Load CSV from file ────────────────────────────────────────────────────
     function loadFile(input, targetId) {
@@ -900,6 +1332,7 @@
       const reader = new FileReader();
       reader.onload = (e) => {
         document.getElementById(targetId).value = e.target.result;
+        resetResultsState();
         scheduleAutosave();
       };
       reader.readAsText(file);
@@ -932,8 +1365,8 @@
 
     // ─── Shared form body builder ───────────────────────────────────────────
     function getFormBody() {
+      const importMode = document.getElementById('importMode').value;
       return {
-        offlineMode: document.getElementById('offlineMode').checked,
         vrstaPrijave: document.getElementById('vrstaPrijave').value,
         osnovZaPrijavu: document.getElementById('osnovZaPrijavu').value,
         year: document.getElementById('year').value,
@@ -952,6 +1385,8 @@
         salesCsv: document.getElementById('salesCsv').value,
         purchasesCsv: document.getElementById('purchasesCsv').value,
         force: document.getElementById('forceCheckbox').checked,
+        roundShares: document.getElementById('roundSharesCheckbox').checked,
+        docPrefix: importMode === 'ibkr' ? ibkrAccountId || '' : '',
       };
     }
 
@@ -965,34 +1400,19 @@
       const body = getFormBody();
 
       try {
-        let result;
-        if (body.offlineMode) {
-          result = window.PorezatorOffline.generateXmlOffline(body);
-        } else {
-          const resp = await fetch('/api/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-          });
-
-          if (!resp.ok) {
-            const err = await resp.json();
-            throw new Error(err.error || 'Greška na serveru');
-          }
-          result = await resp.json();
-        }
+        const result = window.PorezatorOffline.generateXmlOffline(body);
 
         generatedXml = result.xml;
         document.getElementById('preview').textContent = generatedXml;
         document.getElementById('preview').style.display = 'block';
+        document.getElementById('resultsPlaceholder').style.display = 'none';
         document.getElementById('downloadBtn').disabled = false;
         renderDocuments(result.documents, result.summary);
         showAlert('XML uspešno generisan!', 'success');
+        goToStep(4, { refresh: false });
       } catch (err) {
         showAlert(err.message);
-        document.getElementById('preview').style.display = 'none';
-        document.getElementById('downloadBtn').disabled = true;
-        document.getElementById('documentsCard').style.display = 'none';
+        resetResultsState();
       } finally {
         btn.disabled = false;
         btn.innerHTML = 'Generiši XML';
@@ -1027,9 +1447,13 @@
       const salesText = document.getElementById('salesCsv').value.trim();
       const purchasesText = document.getElementById('purchasesCsv').value.trim();
       const box = document.getElementById('validationBox');
+      const roundingOption = document.getElementById('roundingOption');
+      const roundSharesCheckbox = document.getElementById('roundSharesCheckbox');
 
       if (!salesText || !purchasesText) {
         box.style.display = 'none';
+        roundingOption.style.display = 'none';
+        roundSharesCheckbox.checked = false;
         return;
       }
 
@@ -1111,18 +1535,192 @@
       box.innerHTML = output;
       box.style.display = 'block';
 
+      roundingOption.style.display = hasWarning ? 'block' : 'none';
+      if (!hasWarning) {
+        roundSharesCheckbox.checked = false;
+      }
+
       // Show/hide force override checkbox
       document.getElementById('forceOverride').style.display = hasError ? 'block' : 'none';
       if (!hasError) document.getElementById('forceCheckbox').checked = false;
     }
 
-    function loadTable(textareaId, tableWrapId) {
+    function isOfflineIbkrMode() {
+      return true;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function syncRateToCsv(textareaId, dataRowIndex, rateValue) {
+      const textarea = document.getElementById(textareaId);
+      const lines = textarea.value.split('\n').filter(line => line.trim());
+      if (!lines.length) return;
+
+      const hasHeader = lines[0].toLowerCase().includes('datum');
+      const targetIndex = hasHeader ? dataRowIndex + 1 : dataRowIndex;
+      if (!lines[targetIndex]) return;
+
+      const delimiter = lines[targetIndex].includes('\t') ? '\t' : ',';
+      const parts = lines[targetIndex].split(delimiter).map(part => part.trim());
+      while (parts.length < 6) parts.push('');
+      parts[5] = rateValue;
+      lines[targetIndex] = parts.join(delimiter);
+
+      if (hasHeader) {
+        const headerDelimiter = lines[0].includes('\t') ? '\t' : ',';
+        const headerParts = lines[0].split(headerDelimiter).map(part => part.trim());
+        while (headerParts.length < 6) headerParts.push('');
+        headerParts[5] = headerParts[5] || 'srednji_kurs';
+        lines[0] = headerParts.join(headerDelimiter);
+      }
+
+      textarea.value = lines.join('\n');
+    }
+
+    function handleRateInputChange(textareaId, dataRowIndex, value) {
+      syncRateToCsv(textareaId, dataRowIndex, value.trim());
+      resetResultsState();
+      scheduleAutosave();
+    }
+
+    function formatRateValue(value) {
+      return Number(value).toFixed(4).replace(/0+$/, '').replace(/\.$/, '');
+    }
+
+    function collectExchangeRateRequests(text) {
+      const lines = text.split('\n').filter(line => line.trim());
+      const requests = [];
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        if (i === 0 && line.toLowerCase().includes('datum')) continue;
+        const delimiter = line.includes('\t') ? '\t' : ',';
+        const parts = line.split(delimiter).map(part => part.trim());
+        if (parts.length < 5) continue;
+        const date = parts[0];
+        const currency = (parts[4] || '').toUpperCase();
+        if (!date || !currency || currency === 'RSD') continue;
+        requests.push({ date, currency });
+      }
+      return requests;
+    }
+
+    function applyRatesToTextarea(textareaId, ratesByKey) {
+      const textarea = document.getElementById(textareaId);
+      const lines = textarea.value.split('\n').filter(line => line.trim());
+      if (!lines.length) return false;
+
+      const hasHeader = lines[0].toLowerCase().includes('datum');
+      let changed = false;
+
+      for (let i = hasHeader ? 1 : 0; i < lines.length; i++) {
+        const delimiter = lines[i].includes('\t') ? '\t' : ',';
+        const parts = lines[i].split(delimiter).map(part => part.trim());
+        if (parts.length < 5) continue;
+
+        const date = parts[0];
+        const currency = (parts[4] || '').toUpperCase();
+        let rateValue = '';
+        if (currency === 'RSD') {
+          rateValue = '1';
+        } else {
+          const key = `${currency}|${date}`;
+          if (ratesByKey[key] == null) continue;
+          rateValue = formatRateValue(ratesByKey[key]);
+        }
+
+        while (parts.length < 6) parts.push('');
+        parts[5] = rateValue;
+        lines[i] = parts.join(delimiter);
+        changed = true;
+      }
+
+      if (hasHeader) {
+        const headerDelimiter = lines[0].includes('\t') ? '\t' : ',';
+        const headerParts = lines[0].split(headerDelimiter).map(part => part.trim());
+        while (headerParts.length < 6) headerParts.push('');
+        headerParts[5] = 'srednji_kurs';
+        lines[0] = headerParts.join(headerDelimiter);
+      }
+
+      textarea.value = lines.join('\n');
+      return changed;
+    }
+
+    async function prefillExchangeRates() {
+      hideAlert();
+      const btn = document.getElementById('prefillRatesBtn');
+      const requests = [
+        ...collectExchangeRateRequests(document.getElementById('salesCsv').value),
+        ...collectExchangeRateRequests(document.getElementById('purchasesCsv').value),
+      ];
+
+      if (!requests.length) {
+        showAlert('Nema transakcija za preuzimanje kursa.', 'error');
+        return;
+      }
+
+      const unique = [];
+      const seen = new Set();
+      for (const request of requests) {
+        const key = `${request.currency}|${request.date}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        unique.push(request);
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Preuzimam kurseve...';
+
+      try {
+        const ratesByKey = {};
+        const remoteItems = unique.filter(item => item.currency !== 'RSD');
+
+        if (remoteItems.length) {
+          const resp = await fetch('/api/exchange-rates', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: remoteItems }),
+          });
+          if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            throw new Error(err.error || 'Greška pri preuzimanju kurseva.');
+          }
+
+          const data = await resp.json();
+          Object.assign(ratesByKey, data.rates || {});
+        }
+
+        applyRatesToTextarea('salesCsv', ratesByKey);
+        applyRatesToTextarea('purchasesCsv', ratesByKey);
+        resetResultsState();
+        refreshPreview(true);
+        scheduleAutosave();
+        showAlert(`Srednji kurs je popunjen za ${unique.length} datuma/valuta.`, 'success');
+      } catch (err) {
+        showAlert(err.message || 'Greška pri preuzimanju kurseva.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Preuzmi srednje kurseve sa servera';
+      }
+    }
+
+    function loadTable(textareaId, tableWrapId, options = {}) {
+      const { silent = false } = options;
       const text = document.getElementById(textareaId).value.trim();
       const wrap = document.getElementById(tableWrapId);
       if (!text) {
         wrap.style.display = 'none';
-        showAlert('Nema podataka za prikaz.');
-        return;
+        wrap.innerHTML = '';
+        if (!silent) showAlert('Nema podataka za prikaz.');
+        return false;
       }
 
       const lines = text.split('\n').filter(l => l.trim());
@@ -1134,8 +1732,9 @@
 
       // Detect if first row is a header
       let hasHeader = rows[0] && rows[0][0].toLowerCase().includes('datum');
-      const maxCols = Math.max(...rows.map(r => r.length));
-      const defaultHeaders = maxCols >= 6
+      const allowRateEditing = isOfflineIbkrMode();
+      const maxCols = Math.max(...rows.map(r => r.length), allowRateEditing ? 6 : 0);
+      const defaultHeaders = maxCols >= 6 || allowRateEditing
         ? ['Datum', 'Ticker', 'Shares', 'Price', 'Currency', 'Srednji kurs']
         : ['Datum', 'Ticker', 'Shares', 'Price', 'Currency'];
       const headers = hasHeader ? rows[0] : defaultHeaders;
@@ -1143,21 +1742,33 @@
 
       if (dataRows.length === 0) {
         wrap.style.display = 'none';
-        showAlert('Nema redova sa podacima.');
-        return;
+        wrap.innerHTML = '';
+        if (!silent) showAlert('Nema redova sa podacima.');
+        return false;
       }
 
-      let html = '<table class="data-table"><thead><tr>';
+      let html = '<table class="data-table data-table-compact"><thead><tr>';
       html += '<th>#</th>';
-      headers.forEach(h => html += `<th>${h}</th>`);
+      const visibleHeaders = allowRateEditing ? defaultHeaders : headers;
+      visibleHeaders.forEach(h => html += `<th>${h}</th>`);
       html += '</tr></thead><tbody>';
 
       dataRows.forEach((row, i) => {
+        const cells = [...row];
+        if (allowRateEditing) {
+          while (cells.length < 6) cells.push('');
+        }
         html += '<tr>';
         html += `<td class="num">${i + 1}</td>`;
-        row.forEach((cell, ci) => {
-          const isNum = ci >= 2 && ci <= 3 || ci === 5;
-          html += `<td${isNum ? ' class="num"' : ''}>${cell}</td>`;
+        visibleHeaders.forEach((_, ci) => {
+          if (allowRateEditing && ci === 5) {
+            html += `<td class="num"><input class="table-rate-input" type="number" min="0" step="0.0001" inputmode="decimal" value="${escapeHtml(cells[5] || '')}" oninput="handleRateInputChange('${textareaId}', ${i}, this.value)" onchange="handleRateInputChange('${textareaId}', ${i}, this.value)"></td>`;
+            return;
+          }
+
+          const cell = cells[ci] || '';
+          const isNum = (ci >= 2 && ci <= 3) || ci === 5;
+          html += `<td${isNum ? ' class="num"' : ''}>${escapeHtml(cell)}</td>`;
         });
         html += '</tr>';
       });
@@ -1165,8 +1776,27 @@
       html += '</tbody></table>';
       wrap.innerHTML = html;
       wrap.style.display = 'block';
-      hideAlert();
+      if (!silent) {
+        hideAlert();
+        validateCoverage();
+      }
+      return true;
+    }
+
+    function refreshPreview(silent = false) {
+      const hasSales = loadTable('salesCsv', 'salesTable', { silent: true });
+      const hasPurchases = loadTable('purchasesCsv', 'purchasesTable', { silent: true });
+
+      updatePreviewStatus(hasSales, hasPurchases);
       validateCoverage();
+
+      if (!silent) {
+        if (!hasSales && !hasPurchases) {
+          showAlert('Nema podataka za pregled.');
+        } else {
+          hideAlert();
+        }
+      }
     }
 
     // ─── Render documents list ─────────────────────────────────────────────────
@@ -1302,11 +1932,165 @@
       card.style.display = 'block';
     }
 
+    // ─── Import Mode Toggle ──────────────────────────────────────────────
+    function toggleImportMode(shouldAutosave = true) {
+      const mode = document.getElementById('importMode').value;
+      document.getElementById('manualCsvSection').hidden = mode !== 'csv';
+      document.getElementById('ibkrImportSection').hidden = mode !== 'ibkr';
+      if (mode !== 'ibkr') {
+        ibkrAccountId = '';
+        document.getElementById('ibkrStatus').innerHTML = '';
+      }
+      resetResultsState();
+      if (currentStep === 3) refreshPreview(true);
+      if (shouldAutosave) scheduleAutosave();
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          inQuotes = !inQuotes;
+        } else if (ch === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += ch;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    }
+
+    function parseIbkrCsv(text) {
+      const lines = text.split('\n');
+      const buys = [];
+      const sells = [];
+      let accountId = '';
+      let tradeHeaderMap = null;
+
+      function normalizeHeaderName(value) {
+        return String(value || '').trim().toLowerCase();
+      }
+
+      function getField(parts, key) {
+        if (!tradeHeaderMap || tradeHeaderMap[key] == null) return '';
+        return parts[tradeHeaderMap[key]] || '';
+      }
+
+      function parseCodeTokens(value) {
+        return String(value || '')
+          .split(';')
+          .map((token) => token.trim().toLowerCase())
+          .filter(Boolean);
+      }
+
+      for (const line of lines) {
+        const parts = parseCSVLine(line);
+        if (parts[0] !== 'Trades') continue;
+
+        if (parts[1] === 'Header') {
+          // IBKR emits multiple Trades sections; rebuild the header map each time so
+          // we don't depend on hardcoded column indexes.
+          tradeHeaderMap = {};
+          parts.forEach((part, index) => {
+            const normalized = normalizeHeaderName(part);
+            if (normalized) tradeHeaderMap[normalized] = index;
+          });
+          continue;
+        }
+
+        if (parts[1] !== 'Data' || parts[2] !== 'Order') continue;
+        if (getField(parts, 'asset category') !== 'Stocks') continue;
+
+        const currency = getField(parts, 'currency');
+        if (!accountId) accountId = getField(parts, 'account');
+        const symbol = getField(parts, 'symbol');
+        const dateTime = getField(parts, 'date/time');
+        const date = dateTime.split(',')[0].trim();
+        const quantity = parseFloat(getField(parts, 'quantity'));
+        const tPrice = parseFloat(getField(parts, 't. price'));
+        const proceeds = parseFloat(getField(parts, 'proceeds'));
+        const codeTokens = parseCodeTokens(getField(parts, 'code'));
+
+        if (!date || !symbol || !Number.isFinite(quantity) || !Number.isFinite(tPrice)) continue;
+
+        const row = { date, ticker: symbol, shares: Math.abs(quantity), price: tPrice, currency };
+
+  // IBKR marks opening and closing stock trades in the Code column.
+  // That signal is more reliable than inferring direction from quantity alone.
+        const isClosingTrade = codeTokens.includes('c');
+        const isOpeningTrade = codeTokens.includes('o');
+
+        if (isClosingTrade) {
+          sells.push(row);
+        } else if (isOpeningTrade) {
+          buys.push(row);
+        } else if (quantity < 0 || (Number.isFinite(proceeds) && proceeds > 0)) {
+          sells.push(row);
+        } else {
+          buys.push(row);
+        }
+      }
+      return { buys, sells, accountId };
+    }
+
+    function toCsvRows(trades) {
+      return trades.map(t => `${t.date},${t.ticker},${t.shares},${t.price},${t.currency}`).join('\n');
+    }
+
+    async function loadIbkrFiles(options = {}) {
+      const { navigateToPreview = true, silentSuccess = false } = options;
+      const fileInput = document.getElementById('ibkrFiles');
+      const statusEl = document.getElementById('ibkrStatus');
+      if (!fileInput.files.length) {
+        showAlert('Izaberite bar jedan IBKR CSV fajl.', 'error');
+        return false;
+      }
+
+      const allBuys = [];
+      const allSells = [];
+      let detectedAccount = '';
+
+      for (const file of fileInput.files) {
+        const text = await file.text();
+        const { buys, sells, accountId } = parseIbkrCsv(text);
+        allBuys.push(...buys);
+        allSells.push(...sells);
+        if (accountId && !detectedAccount) detectedAccount = accountId;
+      }
+
+      ibkrAccountId = detectedAccount;
+
+  // Normalize IBKR imports back into the app's internal CSV shape.
+      const header = 'datum,ticker,shares,price,currency';
+      document.getElementById('salesCsv').value = allSells.length ? header + '\n' + toCsvRows(allSells) : '';
+      document.getElementById('purchasesCsv').value = allBuys.length ? header + '\n' + toCsvRows(allBuys) : '';
+
+      let msg = `Učitano: <strong>${allBuys.length}</strong> kupovina, <strong>${allSells.length}</strong> prodaja.`;
+      if (detectedAccount) msg += ` Nalog: <strong>${detectedAccount}</strong>`;
+      statusEl.innerHTML = msg;
+      resetResultsState();
+      scheduleAutosave();
+      refreshPreview(true);
+      if (!silentSuccess) {
+        showAlert(`IBKR podaci učitani (${allBuys.length} kupovina, ${allSells.length} prodaja).`, 'success');
+      }
+      if (navigateToPreview) {
+        goToStep(3);
+      }
+      return true;
+    }
+
     // ─── Load example data ─────────────────────────────────────────────────
     function loadExample() {
-      // Switch to offline mode so it works without server
+      document.getElementById('importMode').value = 'csv';
+      toggleImportMode(false);
+
       document.getElementById('offlineMode').checked = true;
-      document.getElementById('offlineMode').dispatchEvent(new Event('change'));
 
       // Filing info
       document.getElementById('filingDate').value = '2026-01-30';
@@ -1329,7 +2113,10 @@
 
       // Trigger date recalculation
       updateDates();
-      showToast('Primer je učitan. Kliknite „Generiši XML" za kreiranje prijave.', 'success');
+      resetResultsState();
+      refreshPreview(true);
+      scheduleAutosave();
+      showAlert('Primer je učitan. Nastavite kroz korake do pregleda i generisanja.', 'success');
     }
 
     // ─── Download CSV template ───────────────────────────────────────────────

@@ -65,4 +65,25 @@ describe('generateXmlOffline', () => {
     expect(result.documents.some(d => d.type === 'Prodaja')).toBe(true);
     expect(result.documents.some(d => d.type === 'Kupovina')).toBe(true);
   });
+
+  test('roundShares rounds only XML display values and annotates ticker and acquisition docs', () => {
+    const result = generateXmlOffline({
+      ...baseBody,
+      purchasesCsv: '2025-01-15,GOOGL,13.24,100,USD,100\n2025-01-16,GOOGL,0.13,100,USD,100',
+      salesCsv: '2025-06-20,GOOGL,13.37,150,USD,100',
+      roundShares: true,
+    });
+
+    expect(result.xml).toContain('<![CDATA[GOOGL (preneto ukupno 13,37 akcija, zbog zaokruživanja prikazano 14)]]>');
+    expect(result.xml).toContain('<ns1:BrojPrenetihHOVInvesticionihJed>14</ns1:BrojPrenetihHOVInvesticionihJed>');
+    expect(result.xml).toContain('<ns1:BrojStecenihHOVInvesticionihJed>13</ns1:BrojStecenihHOVInvesticionihJed>');
+    expect(result.xml).toContain('<ns1:BrojStecenihHOVInvesticionihJed>1</ns1:BrojStecenihHOVInvesticionihJed>');
+    expect(result.xml).toContain('20250116 (stečeno 0,13 zaokruženo 1)');
+    expect(result.xml).toContain('<ns1:ProdajnaCena>200550.00</ns1:ProdajnaCena>');
+
+    expect(result.documents.find(d => d.type === 'Prodaja').shares).toBe(14);
+    expect(result.documents.find(d => d.docNumber.includes('stečeno 0,13 zaokruženo 1'))).toBeTruthy();
+    expect(result.summary.totalSoldRsd).toBe(200550);
+    expect(result.summary.totalBoughtRsd).toBe(133700);
+  });
 });

@@ -1,0 +1,15 @@
+Statement,Header,Field Name,Field Value
+Statement,Data,Title,Activity Statement
+Statement,Data,Period,"January 1, 2025 - December 31, 2025"
+Account Information,Header,Field Name,Field Value
+Account Information,Data,Name,Demo Investor
+Account Information,Data,Account,UDUMMY001 (Custom Consolidated)
+Account Information,Data,Base Currency,EUR
+Trades,Header,DataDiscriminator,Asset Category,Currency,Account,Symbol,Date/Time,Quantity,T. Price,C. Price,Proceeds,Comm/Fee,Basis,Realized P/L,MTM P/L,Code
+Trades,Data,Order,Stocks,EUR,UDUMMY001,VWCE,"2025-11-25, 05:39:35",-85,142.36,142.80,12100.60,-6.05,-8100.43,3994.12,-37.40,C
+Trades,Data,Order,Stocks,USD,UDUMMY001,AAPL,"2025-08-11, 10:01:06",-2.5,226.07,227.18,565.18,-0.36,-431.80,133.38,-2.79,C;FPA;P
+Trades,Data,Order,Stocks,USD,UDUMMY001,MSFT,"2025-05-19, 09:42:58",-1.2,457.00,458.87,548.40,-0.20,-355.45,192.95,-2.10,C;FPA;P
+Trades,Data,Order,Stocks,USD,UDUMMY001,GOOGL,"2025-08-11, 10:01:17",-1.0,199.66,201.00,199.66,-0.18,-141.03,58.63,-1.20,C;FPA;P
+Codes,Header,Code,Meaning
+Codes,Data,C,Closing Trade
+Codes,Data,O,Opening Trade

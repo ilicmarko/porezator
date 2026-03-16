@@ -1,0 +1,14 @@
+Statement,Header,Field Name,Field Value
+Statement,Data,Title,Activity Statement
+Statement,Data,Period,"January 1, 2023 - December 31, 2023"
+Account Information,Header,Field Name,Field Value
+Account Information,Data,Name,Demo Investor
+Account Information,Data,Account,UDUMMY001 (Custom Consolidated)
+Account Information,Data,Base Currency,EUR
+Trades,Header,DataDiscriminator,Asset Category,Currency,Account,Symbol,Date/Time,Quantity,T. Price,C. Price,Proceeds,Comm/Fee,Basis,Realized P/L,MTM P/L,Code
+Trades,Data,Order,Stocks,EUR,UDUMMY001,VWCE,"2023-03-10, 10:15:00",40,98.50,98.42,-3940.00,-1.20,3941.20,0,-3.20,O
+Trades,Data,Order,Stocks,USD,UDUMMY001,AAPL,"2023-05-12, 15:42:00",2.5,172.40,172.10,-431.00,-0.80,431.80,0,-0.75,O;FPA;P
+Trades,Data,Order,Stocks,USD,UDUMMY001,GOOGL,"2023-06-15, 14:11:00",0.75,124.20,124.05,-93.15,-0.35,93.50,0,-0.10,O;FPA;P
+Codes,Header,Code,Meaning
+Codes,Data,C,Closing Trade
+Codes,Data,O,Opening Trade

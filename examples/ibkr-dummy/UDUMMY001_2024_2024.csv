@@ -1,0 +1,14 @@
+Statement,Header,Field Name,Field Value
+Statement,Data,Title,Activity Statement
+Statement,Data,Period,"January 1, 2024 - December 31, 2024"
+Account Information,Header,Field Name,Field Value
+Account Information,Data,Name,Demo Investor
+Account Information,Data,Account,UDUMMY001 (Custom Consolidated)
+Account Information,Data,Base Currency,EUR
+Trades,Header,DataDiscriminator,Asset Category,Currency,Account,Symbol,Date/Time,Quantity,T. Price,C. Price,Proceeds,Comm/Fee,Basis,Realized P/L,MTM P/L,Code
+Trades,Data,Order,Stocks,EUR,UDUMMY001,VWCE,"2024-01-15, 09:35:00",45,107.10,107.05,-4819.50,-1.45,4820.95,0,-2.25,O
+Trades,Data,Order,Stocks,USD,UDUMMY001,MSFT,"2024-02-20, 16:10:00",1.2,295.75,295.10,-354.90,-0.55,355.45,0,-0.78,O;FPA;P
+Trades,Data,Order,Stocks,USD,UDUMMY001,GOOGL,"2024-09-16, 09:30:02",0.25,189.30,189.10,-47.325,-0.20,47.525,0,-0.05,O;FPA;P
+Codes,Header,Code,Meaning
+Codes,Data,C,Closing Trade
+Codes,Data,O,Opening Trade
