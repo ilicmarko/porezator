@@ -894,6 +894,8 @@
             <select id="importMode" onchange="toggleImportMode()">
               <option value="csv" selected>Ručni unos (CSV)</option>
               <option value="ibkr">IBKR Activity Statement</option>
+              <option value="t212">Trading 212 (History export)</option>
+              <option value="revolut">Revolut (Trading account statement)</option>
             </select>
           </div>
         </div>
@@ -945,6 +947,48 @@
               </div>
             </div>
             <div id="ibkrStatus" style="margin-top:0.75rem; font-size:0.85rem;"></div>
+          </div>
+
+          <div class="import-panel" id="t212ImportSection" hidden>
+            <details style="margin-bottom:0.75rem; font-size:0.85rem; color:var(--muted); line-height:1.5;">
+              <summary style="cursor:pointer; font-weight:600; color:var(--text);">ℹ️ Kako preuzeti Trading 212 izveštaj</summary>
+              <ol style="margin-top:0.5rem; padding-left:1.2rem;">
+                <li>U Trading 212 aplikaciji otvorite <strong>History</strong></li>
+                <li>Kliknite na ikonicu za <strong>Export</strong></li>
+                <li>Izaberite period (najviše godinu dana po fajlu) i uključite <strong>Orders</strong></li>
+                <li>Preuzmite CSV fajl</li>
+              </ol>
+              <p style="margin-top:0.4rem;">Možete učitati više fajlova odjednom (npr. po godinama); duplirane transakcije se preskaču.
+                Cena po akciji se računa iz polja <strong>Total</strong> (sa naknadom za konverziju), u valuti naloga.
+                Datum je po beogradskom vremenu.</p>
+            </details>
+            <div class="form-row">
+              <div class="form-group" style="flex:1;">
+                <label for="t212Files">Trading 212 CSV fajlovi</label>
+                <input id="t212Files" type="file" accept=".csv" multiple style="font-size:0.85rem;">
+              </div>
+            </div>
+            <div id="t212Status" style="margin-top:0.75rem; font-size:0.85rem;"></div>
+          </div>
+
+          <div class="import-panel" id="revolutImportSection" hidden>
+            <details style="margin-bottom:0.75rem; font-size:0.85rem; color:var(--muted); line-height:1.5;">
+              <summary style="cursor:pointer; font-weight:600; color:var(--text);">ℹ️ Kako preuzeti Revolut izveštaj</summary>
+              <ol style="margin-top:0.5rem; padding-left:1.2rem;">
+                <li>U Revolut aplikaciji otvorite <strong>Invest</strong></li>
+                <li>Idite na <strong>More</strong> → <strong>Documents</strong> → <strong>Stocks</strong></li>
+                <li>Izaberite <strong>Account statement</strong> (ne Profit and loss), period <strong>All time</strong>, format <strong>Excel</strong> (preuzima se kao CSV)</li>
+              </ol>
+              <p style="margin-top:0.4rem;">Cena po akciji se računa iz polja <strong>Total Amount</strong>. Kolona FX Rate se ne koristi — kurs je srednji kurs NBS.
+                Podela akcija (stock split) se ne preračunava automatski; ako ste prodali akcije nakon podele, dobićete upozorenje.</p>
+            </details>
+            <div class="form-row">
+              <div class="form-group" style="flex:1;">
+                <label for="revolutFiles">Revolut CSV fajlovi</label>
+                <input id="revolutFiles" type="file" accept=".csv" multiple style="font-size:0.85rem;">
+              </div>
+            </div>
+            <div id="revolutStatus" style="margin-top:0.75rem; font-size:0.85rem;"></div>
           </div>
         </div>
       </div>
@@ -1043,6 +1087,7 @@
   </main>
 
   <script src="offline-core.js"></script>
+  <script src="broker-import.js"></script>
   <script>
     let generatedXml = null;
     let ibkrAccountId = '';
@@ -1172,6 +1217,18 @@
           return;
         }
       }
+      if (BROKER_IMPORTS[importMode]) {
+        const cfg = BROKER_IMPORTS[importMode];
+        const fileInput = document.getElementById(cfg.inputId);
+        const hasImportedRows = document.getElementById('salesCsv').value.trim() || document.getElementById('purchasesCsv').value.trim();
+        if (fileInput.files.length) {
+          const loaded = await loadBrokerFiles(importMode, { navigateToPreview: false, silentSuccess: true });
+          if (!loaded) return;
+        } else if (!hasImportedRows) {
+          showAlert(`Izaberite bar jedan ${cfg.label} CSV fajl pre prelaska na pregled.`, 'error');
+          return;
+        }
+      }
 
       goToStep(3);
     }
@@ -1292,6 +1349,10 @@
       document.getElementById('roundSharesCheckbox').checked = false;
       document.getElementById('ibkrFiles').value = '';
       document.getElementById('ibkrStatus').innerHTML = '';
+      document.getElementById('t212Files').value = '';
+      document.getElementById('t212Status').innerHTML = '';
+      document.getElementById('revolutFiles').value = '';
+      document.getElementById('revolutStatus').innerHTML = '';
       document.getElementById('filingDate').value = new Date().toISOString().split('T')[0];
       ibkrAccountId = '';
       syncPeriodFromFilingDate();
@@ -2032,10 +2093,14 @@
       const mode = document.getElementById('importMode').value;
       document.getElementById('manualCsvSection').hidden = mode !== 'csv';
       document.getElementById('ibkrImportSection').hidden = mode !== 'ibkr';
+      document.getElementById('t212ImportSection').hidden = mode !== 't212';
+      document.getElementById('revolutImportSection').hidden = mode !== 'revolut';
       if (mode !== 'ibkr') {
         ibkrAccountId = '';
         document.getElementById('ibkrStatus').innerHTML = '';
       }
+      if (mode !== 't212') document.getElementById('t212Status').innerHTML = '';
+      if (mode !== 'revolut') document.getElementById('revolutStatus').innerHTML = '';
       resetResultsState();
       if (currentStep === 3) refreshPreview(true);
       if (shouldAutosave) scheduleAutosave();
@@ -2177,6 +2242,53 @@
       if (navigateToPreview) {
         goToStep(3);
       }
+      return true;
+    }
+
+    // ─── Broker imports (Trading 212, Revolut) ─────────────────────────────
+    // Parsing lives in public/broker-import.js; rows are written back into the
+    // hidden CSV fields, same as the IBKR import.
+    const BROKER_IMPORTS = {
+      t212: { label: 'Trading 212', inputId: 't212Files', statusId: 't212Status', parse: (t) => window.PorezatorBrokers.parseTrading212Csv(t) },
+      revolut: { label: 'Revolut', inputId: 'revolutFiles', statusId: 'revolutStatus', parse: (t) => window.PorezatorBrokers.parseRevolutCsv(t) },
+    };
+
+    async function loadBrokerFiles(mode, options = {}) {
+      const { navigateToPreview = true, silentSuccess = false } = options;
+      const cfg = BROKER_IMPORTS[mode];
+      const fileInput = document.getElementById(cfg.inputId);
+      const statusEl = document.getElementById(cfg.statusId);
+      if (!fileInput.files.length) {
+        showAlert(`Izaberite bar jedan ${cfg.label} CSV fajl.`, 'error');
+        return false;
+      }
+
+      let merged;
+      try {
+        const results = [];
+        for (const file of fileInput.files) results.push(cfg.parse(await file.text()));
+        merged = window.PorezatorBrokers.mergeImports(results);
+      } catch (err) {
+        showAlert(err.message, 'error');
+        return false;
+      }
+
+      const header = 'datum,ticker,shares,price,currency';
+      document.getElementById('salesCsv').value = merged.sells.length ? header + '\n' + toCsvRows(merged.sells) : '';
+      document.getElementById('purchasesCsv').value = merged.buys.length ? header + '\n' + toCsvRows(merged.buys) : '';
+
+      let msg = `Učitano: <strong>${merged.buys.length}</strong> kupovina, <strong>${merged.sells.length}</strong> prodaja.`;
+      if (merged.duplicates) msg += ` Preskočeno duplikata: ${merged.duplicates}.`;
+      if (merged.skipped) msg += ` Preskočeno neispravnih redova: ${merged.skipped}.`;
+      for (const w of merged.warnings) msg += `<br>⚠️ ${escapeHtml(w)}`;
+      statusEl.innerHTML = msg;
+      resetResultsState();
+      scheduleAutosave();
+      refreshPreview(true);
+      if (!silentSuccess) {
+        showAlert(`${cfg.label} podaci učitani (${merged.buys.length} kupovina, ${merged.sells.length} prodaja).`, 'success');
+      }
+      if (navigateToPreview) goToStep(3);
       return true;
     }
 
