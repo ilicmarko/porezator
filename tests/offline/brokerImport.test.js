@@ -89,3 +89,21 @@ describe('mergeImports', () => {
   });
 });
 
+describe('salesOutsidePeriod', () => {
+  const { salesOutsidePeriod } = require('../../public/offline-core');
+  const sales = [
+    { ticker: 'AAA', date: '2025-12-31' },
+    { ticker: 'BBB', date: '2026-01-01' },
+    { ticker: 'CCC', date: '2026-06-30' },
+    { ticker: 'DDD', date: '2026-07-01' },
+  ];
+  test('H1 keeps January–June only', () => {
+    expect(salesOutsidePeriod(sales, '2026', 'H1').map((s) => s.ticker)).toEqual(['AAA', 'DDD']);
+  });
+  test('H2 keeps July–December only', () => {
+    expect(salesOutsidePeriod(sales, '2026', 'H2').map((s) => s.ticker)).toEqual(['AAA', 'BBB', 'CCC']);
+  });
+  test('unknown period flags nothing', () => {
+    expect(salesOutsidePeriod(sales, '', 'H1')).toEqual([]);
+  });
+});

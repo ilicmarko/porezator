@@ -1688,6 +1688,22 @@
         </div>`;
       }
 
+      const outside = window.PorezatorOffline.salesOutsidePeriod(
+        aggSales,
+        document.getElementById('year').value,
+        document.getElementById('half').value,
+      );
+      if (outside.length) {
+        const items = outside
+          .map((s) => `<li>⚠️ ${escapeHtml(s.ticker)} na ${escapeHtml(s.date)}</li>`)
+          .join('');
+        output += `<div class="alert alert-warning" style="margin-top:0.75rem;">
+          <strong>Upozorenje: ${outside.length} prodaja nije u izabranom polugodištu</strong>
+          <p style="margin:0.25rem 0 0; font-size:0.88rem;">Prijava se podnosi posebno za svako polugodište. Uklonite ove prodaje ili promenite period.</p>
+          <ul style="margin:0.25rem 0 0 1.25rem; font-size:0.88rem;">${items}</ul>
+        </div>`;
+      }
+
       box.innerHTML = output;
       box.style.display = 'block';
 
