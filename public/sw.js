@@ -1,8 +1,9 @@
-const CACHE_NAME = 'porezator-v3';
+const CACHE_NAME = 'porezator-v4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/offline-core.js',
+  '/broker-import.js',
   '/favicon.ico',
   '/favicon.svg',
   '/favicon-96x96.png',

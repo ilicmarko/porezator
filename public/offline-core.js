@@ -119,6 +119,16 @@
     return parsed < 100 ? 2000 + parsed : parsed;
   }
 
+  // PPDG-3R for securities is filed per half-year; a sale outside the chosen
+  // half belongs in a different return.
+  function salesOutsidePeriod(sales, yearStr, half) {
+    const year = yearToFull(yearStr);
+    if (!year || (half !== 'H1' && half !== 'H2')) return [];
+    const from = half === 'H1' ? `${year}-01-01` : `${year}-07-01`;
+    const to = half === 'H1' ? `${year}-06-30` : `${year}-12-31`;
+    return sales.filter((s) => s.date < from || s.date > to);
+  }
+
   function formatSharesForNote(value) {
     return new Intl.NumberFormat('sr-RS', {
       minimumFractionDigits: 0,
@@ -326,6 +336,7 @@
     aggregateRows,
     fifoMatchLocal,
     yearToFull,
+    salesOutsidePeriod,
     generateXmlOffline,
   };
 
